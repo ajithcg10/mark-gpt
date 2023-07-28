@@ -8,18 +8,21 @@ export default function NavBar() {
       <Box>
         {nav.map((i) => {
           return (
-            <Item>
-              <NumberConatiner>
-                <NavSection>
-                  <NavConatiner>
-                    <NavId>{i.id}</NavId>
-                    <NavMenu>{i.menu_name}</NavMenu>
-                  </NavConatiner>
+            // <Item>
+            //   <NumberConatiner>
+            <NavSection className={i.id == 5 ? "active" : ""}>
+              <NavConatiner>
+                <NavId>{i.id}</NavId>
+                <NavMenu>{i.menu_name}</NavMenu>
+              </NavConatiner>
 
-                  <NavLIne className={i.id == 5 ? "active" : ""}></NavLIne>
-                </NavSection>
-              </NumberConatiner>
-            </Item>
+              <NavLIne
+                id={i.id == 5 ? "active_line" : ""}
+                className="line"
+              ></NavLIne>
+            </NavSection>
+            //   </NumberConatiner>
+            // </Item>
           );
         })}
       </Box>
@@ -29,20 +32,38 @@ export default function NavBar() {
 const Conatiner = styled.div`
   width: 100%;
   padding-top: 50px;
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 const Box = styled.div`
   display: flex;
 
-  width: 60%;
+  width: fit-content;
+
   margin: 0 auto;
+  @media (max-width: 980px) {
+    width: 80%;
+    margin: 0 auto;
+    justify-content: center;
+  }
 `;
-const Item = styled.div`
-  width: 70%;
-`;
-const NumberConatiner = styled.div``;
+// const Item = styled.div`
+//   width: 70%;
+// `;
+// const NumberConatiner = styled.div``;
 const NavSection = styled.div`
   display: flex;
   align-items: center;
+  justify-content: center;
+  width: 120px;
+  position: relative;
+  &.active {
+    flex: none;
+  }
+  &:last-child {
+    width: fit-content;
+  }
 `;
 const NavConatiner = styled.div`
   display: flex;
@@ -62,8 +83,8 @@ const NavLIne = styled.div`
   border-bottom: 1px solid rgba(142, 152, 163, 1);
 
   width: 100%;
-  &.active {
-    display: none;
+  &#active_line {
+    visibility: hidden;
   }
 `;
 const NavMenu = styled.p`
@@ -75,4 +96,7 @@ const NavMenu = styled.p`
   transform: translateX(-50%);
   width: 200px;
   right: 0;
+  @media (max-width: 980px) {
+    font-size: 13px;
+  }
 `;

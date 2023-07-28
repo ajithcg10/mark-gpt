@@ -1,8 +1,50 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { styled } from "styled-components";
-
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import { MyContext } from "../../contexts/Context";
 export default function SignPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const {
+    state: { user_data },
+    dispatch,
+  } = useContext(MyContext);
+  console.log(user_data, "jjj");
+  const formData = new FormData();
+  formData.append("email", email);
+  formData.append("password", password);
+
+  const handleSubmit = async (event) => {
+    try {
+      // Replace 'YOUR_API_ENDPOINT' with your actual API endpoint URL
+      const response = await axios.post(
+        "http://api.markgpt.ai/api/v1/accounts/sign_in/",
+        formData
+      );
+      if (response.data.StatusCode == 6000) {
+        console.log("hii");
+        dispatch({
+          type: "UPDATE_USER_DATA",
+          payload: {
+            is_verified: true,
+            access_token: response.data.data.access,
+            name: email,
+          },
+        });
+      }
+
+      console.log(response.data.data.access, "hello");
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   return (
     <div>
       <Container>
@@ -21,11 +63,19 @@ export default function SignPage() {
                 <SingleForm>
                   <InputConatiner>
                     <Label>Email</Label>
-                    <Input />
+                    <Input
+                      type="email"
+                      onChange={(e) => setEmail(e.target.value)}
+                      value={email}
+                    />
                   </InputConatiner>
                   <InputConatiner>
                     <Label>Set Password</Label>
-                    <Input type={showPassword ? "text" : "password"} />
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      onChange={(e) => setPassword(e.target.value)}
+                      value={password}
+                    />
                     <ShowPassword
                       onClick={() => setShowPassword(!showPassword)}
                     >
@@ -38,7 +88,9 @@ export default function SignPage() {
                 </SingleForm>
               </FormTitle>
               <ButtonContainer>
-                <Content>Signup</Content>
+                <Link to="/">
+                  <Content onClick={() => handleSubmit()}>Sign In</Content>
+                </Link>
               </ButtonContainer>
               <GoggleContainer>
                 <Facilty>Or signup using</Facilty>
@@ -55,7 +107,11 @@ export default function SignPage() {
           </Box>
         </BottomConatiner>
         <Signin>
-          Dont have a account? <Span> Sign in</Span>
+          Dont have a account?
+          <Span onClick={() => navigate("/signup", { replace: true })}>
+            {" "}
+            Sign up
+          </Span>
         </Signin>
       </Container>
     </div>
@@ -143,6 +199,7 @@ const Show = styled.img``;
 const ButtonContainer = styled.div`
   width: 100%;
   display: flex;
+  cursor: pointer;
 
   justify-content: center;
   align-items: center;

@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { styled } from "styled-components";
+import { useNavigate } from "react-router-dom";
 
 export default function Siginup() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   return (
     <div>
@@ -91,7 +93,11 @@ export default function Siginup() {
           </Box>
         </BottomConatiner>
         <Signin>
-          Already have an account?<Span> Sign in</Span>
+          Already have an account?
+          <Span onClick={() => navigate("/signin", { replace: true })}>
+            {" "}
+            Sign in
+          </Span>
         </Signin>
       </Container>
     </div>
@@ -220,6 +226,7 @@ const Show = styled.img``;
 const ButtonContainer = styled.div`
   width: 100%;
   display: flex;
+  cursor: pointer;
 
   justify-content: center;
   align-items: center;

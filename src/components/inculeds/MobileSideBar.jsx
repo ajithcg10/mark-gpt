@@ -1,35 +1,29 @@
-import React, { useContext, useEffect, useState } from "react";
-
+import React from "react";
 import { styled } from "styled-components";
-import { Link } from "react-router-dom";
-import { MyContext } from "../contexts/Context";
+import { AiOutlineCloseSquare } from "react-icons/ai";
 
-export default function HomeSideBar() {
-  const {
-    state: { user_data },
-    dispatch,
-  } = useContext(MyContext);
-
+export default function MobileSideBar({ show, SetShow }) {
   return (
-    <Container>
+    <Container className={show && "active"}>
       <TopSection>
+        <IconConatiner onClick={() => SetShow(false)}>
+          <AiOutlineCloseSquare />
+        </IconConatiner>
         <Title>
           Mark<Span>GPT</Span>
         </Title>
         <HomeSection>
-          <Link to="/">
-            <HomeConatiner>
-              <HomeIconContainer>
-                <LineDiv>e</LineDiv>
-                <HomeIconSection>
-                  <HomeIcon
-                    src={require("../../assets/image/dashborad/home.png")}
-                  />
-                </HomeIconSection>
-              </HomeIconContainer>
-              <HomeContent>Home</HomeContent>
-            </HomeConatiner>
-          </Link>
+          <HomeConatiner>
+            <HomeIconContainer>
+              <LineDiv>e</LineDiv>
+              <HomeIconSection>
+                <HomeIcon
+                  src={require("../../assets/image/dashborad/home.png")}
+                />
+              </HomeIconSection>
+            </HomeIconContainer>
+            <HomeContent>Home</HomeContent>
+          </HomeConatiner>
           <HistoryConatiner>
             <HistoryIconContainer>
               <HistoryIcon
@@ -49,21 +43,12 @@ export default function HomeSideBar() {
           </UpgradeIconContainer>
           <UpgradeContent>Upgrade</UpgradeContent>
         </UpgradeConatiner>
-        <ProfileConatiner
-          onClick={() => {
-            dispatch({
-              type: "UPDATE_USER_DATA",
-              payload: {
-                is_verified: false,
-              },
-            });
-          }}
-        >
+        <ProfileConatiner>
           <ProfileIconContainer>
             <ProfileIcon
               src={require("../../assets/image/dashborad/profile.png")}
             />
-            <Username>{user_data.name}</Username>
+            <Username>Ajith</Username>
           </ProfileIconContainer>
 
           <OptionIconContainer>
@@ -79,21 +64,33 @@ export default function HomeSideBar() {
 const Container = styled.div`
   height: 100vh;
   border-right: 1px solid #212f41;
+  z-index: 2;
   background: rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(4px);
-  width: 250px;
+  position: fixed;
+  width: 300px;
+  overflow: hidden;
+  left: -390px;
   display: flex;
+  transition: all ease-in 0.5s;
   flex-direction: column;
   justify-content: space-between;
   padding: 50px 10px;
-  @media (max-width: 980px) {
-    width: 300px;
-  }
-  @media (max-width: 640px) {
-    display: none;
+
+  &.active {
+    z-index: 2;
+
+    left: 0px;
+    transition: all ease-in 0.5s;
   }
 `;
 const TopSection = styled.div``;
+const IconConatiner = styled.div`
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 31px;
+`;
 const Title = styled.h1`
   font-family: gordita_medium;
   margin-bottom: 20px;
@@ -106,7 +103,6 @@ const Span = styled.span`
 const HomeSection = styled.div``;
 const HomeConatiner = styled.div`
   display: flex;
-  cursor: pointer;
   align-items: center;
   padding: 10px;
   border-radius: 8px;
@@ -140,7 +136,6 @@ const HomeContent = styled.h5`
 `;
 const HistoryConatiner = styled.div`
   display: flex;
-  cursor: pointer;
   align-items: center;
   padding: 10px;
   margin-top: 10px;
@@ -169,7 +164,6 @@ const UpgradeConatiner = styled.div`
   display: flex;
   align-items: center;
   padding: 10px;
-  cursor: pointer;
   margin-top: 10px;
   border-radius: 8px;
   border: 1px solid #1e91e3;
@@ -193,7 +187,6 @@ const UpgradeContent = styled.h5`
 const ProfileConatiner = styled.div`
   display: flex;
   align-items: center;
-  cursor: pointer;
   padding: 10px;
   margin-top: 10px;
   border-radius: 8px;

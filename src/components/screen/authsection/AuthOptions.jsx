@@ -1,5 +1,5 @@
-import React from "react";
 import { styled } from "styled-components";
+import { Link } from "react-router-dom";
 
 export default function AuthOptions() {
   return (
@@ -11,7 +11,10 @@ export default function AuthOptions() {
               Mark<Span>GPT</Span>
             </Title>
             <CreateAc>
-              Don’t have an account?<Span> Create account</Span>
+              Don’t have an account?
+              <Link to="signup/">
+                <Span> Create account</Span>
+              </Link>
             </CreateAc>
           </TopSection>
           <BottomConatiner>
@@ -28,7 +31,9 @@ export default function AuthOptions() {
               <Content>Or</Content>
               <RightSection></RightSection>
             </SectionConatiner>
-            <SignIn>Continue with email</SignIn>
+            <Link to="signin">
+              <SignIn>Continue with email</SignIn>
+            </Link>
           </BottomConatiner>
         </Box>
       </Container>
