@@ -1,6 +1,5 @@
 import React, { useReducer } from "react";
 import { authReducer } from "./Reducer";
-import { segment } from "../helpers/Object";
 import { point } from "../helpers/Object";
 import { social_media } from "../helpers/Object";
 export const MyContext = React.createContext();
@@ -12,10 +11,14 @@ export default function Context({ children }) {
       access_token: "",
       name: "",
     },
+    plan_modal: {
+      isPlan: false,
+    },
     currentParams: {},
     segment_data: {
       segment: "",
     },
+    social_data: {},
 
     // segment: segment,
     point: point,

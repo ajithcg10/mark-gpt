@@ -10,12 +10,19 @@ import { Link } from "react-router-dom";
 import { TiThMenu } from "react-icons/ti";
 import MobileSideBar from "../../inculeds/MobileSideBar";
 import { RotatingTriangles } from "react-loader-spinner";
-
+import { nav } from "../../helpers/NavMenu";
+import PlanModal from "../../inculeds/PlanModal";
+import ButtonLoader from "../../inculeds/ButtonLoader";
+import { useNavigate } from "react-router-dom";
 export default function Segments() {
   const [show, SetShow] = useState(false);
-  const data = {
-    ta: ["hi", "jj"],
-  };
+  const [isLoading, setLoading] = useState(false);
+
+  nav.map((i) => {
+    return (i.business_verifyed = 1);
+  });
+  let navigate = useNavigate();
+
   const style = {
     position: "fixed",
     top: "50%",
@@ -23,47 +30,12 @@ export default function Segments() {
     transform: "translate(-50%, -50%)",
   };
   const {
-    state: { segment, segemnt_cart, user_data, segment_data },
+    state: { segment, segemnt_cart, user_data, segment_data, plan_modal },
     dispatch,
   } = useContext(MyContext);
-  console.log(segment_data);
-  // const datadata = segment_data?.segment.segments;
-  // const lines = datadata?.split("\n");
-  // console.log(lines, "---lines");
-  // console.log(datadata, "----segemmm");
-  if (segment_data) {
-    const jsonData = {};
-    const sections = segment_data?.segment?.segments
-      .split("\n\n")
-      .map((section) => section.split("\n"));
-    sections.forEach((section) => {
-      const sectionName = section[0].trim();
-      jsonData[sectionName] = section.slice(1).map((item) => {
-        const [key, value] = item.trim().split(":");
-        return { [key.trim()]: value.trim() };
-      });
-    });
-    console.log(jsonData, "sectoiiiii");
-  }
-  // useEffect(() => {
-  //   if (segment_data) {
-  //     const lines = segment_data?.split("\n");
-  //     console.log(lines);
-  //   }
-  // }, [segment_data]);
-  console.log(segment_data);
-  // const sections = segment_data
-  //   .split("\n\n")
-  //   .map((section) => section.split("\n"));
-  // const jsonData = {};
-  // sections.forEach((section) => {
-  //   const sectionName = section[0].trim();
-  //   jsonData[sectionName] = section.slice(1).map((item) => {
-  //     const [key, value] = item.trim().split(":");
-  //     return { [key.trim()]: value.trim() };
-  //   });
-  // });
-  // console.log(jsonData);
+
+  let jsonData = segment_data?.segment;
+
   const formData = new FormData();
   formData.append("targeted_audience", segemnt_cart);
 
@@ -100,36 +72,59 @@ export default function Segments() {
       setObjectArray([]);
     }
   }, 500);
+  useEffect(() => {
+    async function fetchSegment_Data() {
+      let promise = new Promise((resolve, reject) => {
+        let segment_data = localStorage.getItem("segment_data");
+        segment_data = JSON.parse(segment_data);
+
+        dispatch({
+          type: "UPDATE_SEGMENT_DATA",
+          payload: { ...segment_data },
+        });
+      });
+
+      let result = await promise;
+    }
+
+    fetchSegment_Data();
+  }, []);
 
   const makePostRequest = async () => {
     const url = "http://api.markgpt.ai/api/v1/accounts/prompt/"; // Replace with your API URL
     const bearerToken = user_data.access_token; // Replace with your actual Bearer token
 
-    try {
-      const response = await axios.post(url, formData, {
-        headers: {
-          Authorization: `Bearer ${bearerToken}`,
-          "Content-Type": "application/json", // Adjust the Content-Type if needed
-        },
-        params: { prompt_no: "2" },
-      });
-      if (response.data.StatusCode == 6000) {
-        dispatch({
-          type: "UPDATE_SEGMENT_DATA",
-          payload: response.data.data,
+    if (segemnt_cart != 0) {
+      setLoading(true);
+      try {
+        const response = await axios.post(url, formData, {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            "Content-Type": "application/json", // Adjust the Content-Type if needed
+          },
+          params: { prompt_no: "2" },
         });
-      }
+        if (response.data.StatusCode == 6000) {
+          dispatch({
+            type: "UPDATE_SEGMENT_DATA",
+            payload: response.data.data,
+          });
+          navigate("/points");
+          setLoading(false);
+        }
 
-      // Handle the response data here (e.g., update state, display messages, etc.)
-    } catch (error) {
-      // Handle errors here
-      console.error("Error making the API call:", error);
+        // Handle the response data here (e.g., update state, display messages, etc.)
+      } catch (error) {
+        // Handle errors here
+        console.error("Error making the API call:", error);
+        setLoading(false);
+      }
     }
   };
 
   return (
     <div>
-      {data ? (
+      {jsonData ? (
         <Container>
           <HomeSideBar />
           <MobileSideBar show={show} SetShow={SetShow} />
@@ -147,43 +142,52 @@ export default function Segments() {
               </TopSection>
               <CenterContainer>
                 <Box>
-                  {Object.keys(data)?.map((key) => {
+                  {Object.keys(jsonData)?.map((key) => {
                     return (
                       <Item>
                         <Content>{key}</Content>
                         <Sub>
-                          {data &&
-                            data[key]?.map((element) => {
-                              console.log(element, "elu");
-                              return segemnt_cart.some((p) => p == element) ? (
-                                <ValueConatiner
-                                  className="active"
-                                  onClick={() => {
-                                    dispatch({
-                                      type: "Remove_Segmaents",
-                                      payload: element,
-                                    });
-                                  }}
-                                >
-                                  <Segment>
-                                    <Span>{element} </Span>
-                                  </Segment>
-                                </ValueConatiner>
-                              ) : (
-                                <ValueConatiner
-                                  onClick={() => {
-                                    dispatch({
-                                      type: "Add_Segmaents",
-                                      payload: element,
-                                    });
-                                  }}
-                                >
-                                  <Segment>
-                                    <Span>{element} </Span>
-                                  </Segment>
-                                </ValueConatiner>
-                              );
-                            })}
+                          {Object.entries(jsonData).map(
+                            ([key, array], index) => (
+                              <>
+                                {array.map((item) => {
+                                  const obj = JSON.stringify(item);
+                                  const newObj = obj.replace(/[{}"]/g, "");
+
+                                  return segemnt_cart.some(
+                                    (p) => p == newObj
+                                  ) ? (
+                                    <ValueConatiner
+                                      className="active"
+                                      onClick={() => {
+                                        dispatch({
+                                          type: "Remove_Segmaents",
+                                          payload: newObj,
+                                        });
+                                      }}
+                                    >
+                                      <Segment>
+                                        <Span>{newObj} </Span>
+                                      </Segment>
+                                    </ValueConatiner>
+                                  ) : (
+                                    <ValueConatiner
+                                      onClick={() => {
+                                        dispatch({
+                                          type: "Add_Segmaents",
+                                          payload: newObj,
+                                        });
+                                      }}
+                                    >
+                                      <Segment>
+                                        <Span>{newObj} </Span>
+                                      </Segment>
+                                    </ValueConatiner>
+                                  );
+                                })}
+                              </>
+                            )
+                          )}
                         </Sub>
                       </Item>
                     );
@@ -228,18 +232,18 @@ export default function Segments() {
                   </InputConatiner>
                 </SegmentAddConatiner>
               </BottomConatiner>
-              <Link to={segemnt_cart.length != 0 && "/points"}>
-                <ButtonConainer onClick={() => makePostRequest()}>
-                  <Next>Get pain points</Next>
-                  <ArrowConatiner>
-                    <ArrowIcon
-                      src={require("../../../assets/image/segments/Arrow.png")}
-                    />
-                  </ArrowConatiner>
-                </ButtonConainer>
-              </Link>
+
+              <ButtonConainer onClick={() => makePostRequest()}>
+                <Next>{isLoading ? <ButtonLoader /> : "Get pain points"}</Next>
+                <ArrowConatiner>
+                  <ArrowIcon
+                    src={require("../../../assets/image/segments/Arrow.png")}
+                  />
+                </ArrowConatiner>
+              </ButtonConainer>
             </SegmentContainer>
           </Wrapper>
+          <PlanModal />
         </Container>
       ) : (
         <div style={style}>
@@ -361,6 +365,7 @@ const Content = styled.p`
 `;
 const ValueConatiner = styled.div`
   border-radius: 10px;
+  cursor: pointer;
   background: #1a2630;
   width: fit-content;
   padding: 10px;
@@ -377,6 +382,7 @@ const Segment = styled.h4`
   font-size: 14px;
   text-align: left;
   display: flex;
+  cursor: pointer;
   // align-items: center;
   @media (max-width: 768px) {
     font-size: 13px;
@@ -413,6 +419,7 @@ const Ul = styled.ul`
 `;
 const Li = styled.li`
   width: fit-content;
+
   font-size: 14px;
   border-radius: 10px;
   margin-right: 10px;
@@ -435,7 +442,9 @@ const InputConatiner = styled.div`
   margin-top: 10px;
   align-items: center;
 `;
-const SenIcon = styled.div``;
+const SenIcon = styled.div`
+  cursor: pointer;
+`;
 
 const SegmentValue = styled.div`
   text-align: left;
@@ -445,6 +454,7 @@ const SegmentValue = styled.div`
 `;
 const CloseIconConatiner = styled.div`
   margin-left: 10px;
+  cursor: pointer;
 `;
 const CloseIcon = styled.img`
   display: block;
@@ -461,9 +471,10 @@ const ButtonConainer = styled.div`
   border: 1px solid #253644;
   background: #1a2630;
   width: fit-content;
-  /* padding: 10px; */
+  padding: 0px 10px;
+
   margin-top: 30px;
-  padding: 10px 20px;M
+  height: 50px;
 `;
 const Next = styled.h5`
   color: rgba(30, 145, 227, 1);

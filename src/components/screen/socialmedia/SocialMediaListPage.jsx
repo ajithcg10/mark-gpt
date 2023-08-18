@@ -1,20 +1,25 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { MyContext } from "../../contexts/Context";
 import axios from "axios";
 import { styled } from "styled-components";
 import NavBar from "../../inculeds/NavBar";
 import HomeSideBar from "../../inculeds/HomeSideBar";
-import { Link } from "react-router-dom";
+import PlanModal from "../../inculeds/PlanModal";
 import { TiThMenu } from "react-icons/ti";
 import MobileSideBar from "../../inculeds/MobileSideBar";
+import { social_media } from "../../helpers/Object";
+import { nav } from "../../helpers/NavMenu";
+import ButtonLoader from "../../inculeds/ButtonLoader";
+import { useNavigate } from "react-router-dom";
 
 export default function SocialMediaListPage() {
   const [show, SetShow] = useState(false);
+  const [isLoading, setLoading] = useState(false);
   const {
-    state: { social_media, social_cart, user_data },
+    state: { social_cart, user_data },
     dispatch,
   } = useContext(MyContext);
-  console.log(social_cart, "cart");
+  let navigate = useNavigate();
 
   const formData = new FormData();
   formData.append("social_media", social_cart);
@@ -22,30 +27,46 @@ export default function SocialMediaListPage() {
   const makePostRequest = async () => {
     const url = "http://api.markgpt.ai/api/v1/accounts/prompt/"; // Replace with your API URL
     const bearerToken = user_data.access_token; // Replace with your actual Bearer token
-
-    try {
-      const response = await axios.post(url, formData, {
-        headers: {
-          Authorization: `Bearer ${bearerToken}`,
-          "Content-Type": "application/json", // Adjust the Content-Type if needed
-        },
-      });
-      if (response.data.StatusCode == 6000) {
-        dispatch({
-          type: "UPDATE_SEGMENT_DATA",
-          payload: {
-            segment: response.data.data,
+    if (social_cart != 0) {
+      setLoading(true);
+      try {
+        const response = await axios.post(url, formData, {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            "Content-Type": "application/json", // Adjust the Content-Type if needed
           },
         });
-      }
-      console.log(response.data.data, "response social");
+        const content = response.data.data.add_points
+          ?.split("\n")
+          .filter((item) => item.trim() !== "");
+        if (response.data.StatusCode == 6000) {
+          dispatch({
+            type: "UPDATE_SOCIAL_DATA",
+            payload: {
+              add_points: content,
+              social_cart: social_cart,
+            },
+          });
+          navigate("/socialmedia");
+          setLoading(false);
+        }
 
-      // Handle the response data here (e.g., update state, display messages, etc.)
-    } catch (error) {
-      // Handle errors here
-      console.error("Error making the API call:", error);
+        // Handle the response data here (e.g., update state, display messages, etc.)
+      } catch (error) {
+        // Handle errors here
+        console.error("Error making the API call:", error);
+        setLoading(false);
+      }
     }
   };
+  nav.map((i) => {
+    return (
+      (i.segment_verifyed = 2),
+      (i.business_verifyed = 1),
+      (i.point_verifyed = 3),
+      (i.landing_verifyed = 4)
+    );
+  });
 
   return (
     <Container>
@@ -108,18 +129,18 @@ export default function SocialMediaListPage() {
               })}
             </Ul>
           </CenterSection>
-          <Link to={social_cart.length != 0 && "/socialmedia"}>
-            <ButtonConainer onClick={() => makePostRequest()}>
-              <Next>Get pain points</Next>
-              <ArrowConatiner>
-                <ArrowIcon
-                  src={require("../../../assets/image/segments/Arrow.png")}
-                />
-              </ArrowConatiner>
-            </ButtonConainer>
-          </Link>
+
+          <ButtonConainer onClick={() => makePostRequest()}>
+            <Next> {isLoading ? <ButtonLoader /> : "Generate content"}</Next>
+            <ArrowConatiner>
+              <ArrowIcon
+                src={require("../../../assets/image/segments/Arrow.png")}
+              />
+            </ArrowConatiner>
+          </ButtonConainer>
         </Box>
       </Wrapper>
+      <PlanModal />
     </Container>
   );
 }
@@ -266,7 +287,8 @@ const ButtonConainer = styled.div`
   width: fit-content;
   /* padding: 10px; */
   margin-top: 30px;
-  padding: 10px 20px;
+  padding: 0px 10px;
+  height: 50px;
 `;
 const Next = styled.h5`
   color: rgba(30, 145, 227, 1);

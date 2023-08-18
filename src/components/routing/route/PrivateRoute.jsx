@@ -13,11 +13,7 @@ export default function PrivateRoute({ children }) {
     children
   ) : (
     <Navigate
-      to={
-        location.pathname
-          ? `auth/signin?next=${location.pathname}`
-          : "/auth/signin"
-      }
+      to={location.pathname ? `auth/?next=${location.pathname}` : "/auth/"}
     />
   );
 }

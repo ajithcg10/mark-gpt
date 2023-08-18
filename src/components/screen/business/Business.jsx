@@ -5,12 +5,16 @@ import axios from "axios";
 import { styled } from "styled-components";
 import NavBar from "../../inculeds/NavBar";
 import HomeSideBar from "../../inculeds/HomeSideBar";
-import { Link } from "react-router-dom";
 import { TiThMenu } from "react-icons/ti";
 import MobileSideBar from "../../inculeds/MobileSideBar";
+import ButtonLoader from "../../inculeds/ButtonLoader";
+import BusinessModal from "../../inculeds/BusinessModal";
+import PlanModal from "../../inculeds/PlanModal";
 
 export default function Business() {
   const [show, SetShow] = useState(false);
+
+  const [isModal, setModal] = useState(false);
   const [inputType, setInputType] = useState({
     business_name: true,
     business_industry: false,
@@ -20,19 +24,20 @@ export default function Business() {
   const [business, setBusiness] = useState("");
   const [industry, setIndustry] = useState("");
   const [primary, setPrimary] = useState("");
+  const [isLoading, setLoading] = useState(false);
   // const [business, setBusiness] = useState("");
   let navigate = useNavigate();
 
   const {
-    state: { user_data, segment_data },
+    state: { user_data },
     dispatch,
   } = useContext(MyContext);
 
   useEffect(() => {
     if (
       inputValues.length !== 0 &&
-      inputValues[0] != "" &&
-      inputType.business_name == true
+      inputValues[0] !== "" &&
+      inputType.business_name === true
     ) {
       setInputType({
         ...inputType,
@@ -41,8 +46,8 @@ export default function Business() {
       });
     } else if (
       inputValues.length !== 0 &&
-      inputValues[0] != "" &&
-      inputType.business_industry == true
+      inputValues[0] !== "" &&
+      inputType.business_industry === true
     ) {
       setInputType({
         ...inputType,
@@ -53,7 +58,7 @@ export default function Business() {
   }, [inputValues.length]);
 
   setTimeout(() => {
-    if (inputValues.length != 0) {
+    if (inputValues.length !== 0) {
       setInputValues([]);
     }
   }, 500);
@@ -74,7 +79,7 @@ export default function Business() {
   const makePostRequest = async () => {
     const url = "http://api.markgpt.ai/api/v1/accounts/prompt-detail/"; // Replace with your API URL
     const bearerToken = user_data.access_token; // Replace with your actual Bearer token
-
+    setLoading(true);
     try {
       const response = await axios.post(url, formData, {
         headers: {
@@ -82,25 +87,66 @@ export default function Business() {
           "Content-Type": "application/json", // Adjust the Content-Type if needed
         },
       });
-      if (response.data.StatusCode == 6000) {
+      if (response.data.StatusCode === 6000) {
+        let jsonData = {};
+        setModal(true);
+
+        const sections = response.data.data.segments
+          .split("\n\n")
+          .map((section) => section.split("\n"));
+        sections.forEach((section) => {
+          const sectionName = section[0].trim();
+          jsonData[sectionName] = section.slice(1).map((item) => {
+            const [key, value] = item.trim().split(":");
+            return { [key.trim()]: value.trim() };
+          });
+        });
+
         dispatch({
           type: "UPDATE_SEGMENT_DATA",
           payload: {
-            segment: response.data.data,
+            segment: jsonData,
+            business: {
+              business,
+              industry,
+              primary,
+            },
           },
         });
+        setLoading(false);
       }
-      if (response.data.StatusCode == 6001) {
+      if (response.data.StatusCode === 6001) {
         navigate("/business");
+        setLoading(false);
       }
 
       // Handle the response data here (e.g., update state, display messages, etc.)
     } catch (error) {
+      setLoading(false);
       // Handle errors here
       console.error("Error making the API call:", error);
     }
   };
+  useEffect(() => {
+    async function fetchSegment_Data() {
+      let promise = new Promise((resolve, reject) => {
+        let segment_data = localStorage.getItem("segment_data");
+        segment_data = JSON.parse(segment_data);
 
+        dispatch({
+          type: "UPDATE_SEGMENT_DATA",
+          payload: { ...segment_data },
+        });
+      });
+
+      let result = await promise;
+    }
+
+    fetchSegment_Data();
+  }, []);
+  useEffect(() => {
+    localStorage.removeItem("hasPageRefreshed");
+  }, []);
   return (
     <Container>
       <HomeSideBar />
@@ -199,20 +245,21 @@ export default function Business() {
                   }}
                 />
               </InputConatiner>
-              <Link to={primary != "" ? "/segments" : "/business"}>
-                <SectionConatiner onClick={() => makePostRequest()}>
-                  <Next>Get segments</Next>
-                  <ArroConatiner>
-                    <Arrow
-                      src={require("../../../assets/image/business/Arrow.png")}
-                    />
-                  </ArroConatiner>
-                </SectionConatiner>
-              </Link>
+
+              <SectionConatiner onClick={() => makePostRequest()}>
+                <Next> {isLoading ? <ButtonLoader /> : "Submit"}</Next>
+                <ArroConatiner>
+                  <Arrow
+                    src={require("../../../assets/image/business/Arrow.png")}
+                  />
+                </ArroConatiner>
+              </SectionConatiner>
             </BottomConatiner>
           </Box>
         )}
       </Wrapper>
+      <BusinessModal isModal={isModal} setModal={setModal} />
+      <PlanModal />
     </Container>
   );
 }
@@ -304,9 +351,7 @@ const InputConatiner = styled.div`
     width: unset;
   }
 `;
-const GoggleAuthImage = styled.div`
-  margin-right: 6px;
-`;
+
 const Input = styled.input`
   width: 100%;
   &::placeholder {
@@ -316,10 +361,7 @@ const Input = styled.input`
     font-size: 12px;
   }
 `;
-const GoggleAuthContent = styled.h6`
-  font-size: 14px;
-  color: #1e91e3;
-`;
+
 const SectionConatiner = styled.div`
   display: flex;
   align-items: center;
@@ -333,7 +375,7 @@ const SectionConatiner = styled.div`
   /* padding: 10px; */
   margin-top: 30px;
   cursor: pointer;
-  padding: 10px;
+  height: 50px;
 `;
 const Next = styled.h5`
   color: rgba(30, 145, 227, 1);

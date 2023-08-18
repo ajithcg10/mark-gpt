@@ -8,9 +8,7 @@ export const authReducer = (state, action) => {
     case "Remove_Segmaents":
       return {
         ...state,
-        segemnt_cart: state.segemnt_cart.filter(
-          (p) => p.id !== action.payload.id
-        ),
+        segemnt_cart: state.segemnt_cart.filter((p) => p !== action.payload),
       };
     case "Add_Points":
       return {
@@ -23,11 +21,9 @@ export const authReducer = (state, action) => {
         points_cart: state.points_cart.filter((p) => p !== action.payload),
       };
     case "Add_Social":
-      const social_cart = [...state.social_cart, action.payload];
-      localStorage.setItem("social_cart", JSON.stringify(social_cart));
       return {
         ...state,
-        social_cart: social_cart,
+        social_cart: [...state.social_cart, action.payload],
       };
 
     case "Remove_Social":
@@ -49,10 +45,29 @@ export const authReducer = (state, action) => {
         ...state,
         segment_data: segment_data,
       };
+    case "UPDATE_SOCIAL_DATA":
+      const social_data = { ...state.social_data, ...action.payload };
+      localStorage.setItem("social_data", JSON.stringify(social_data));
+      return {
+        ...state,
+        social_data: social_data,
+      };
+    // case "UPDATE_SOCIAL_DATA":
+    //   const social_cart = { ...state.social_cart, ...action.payload };
+    //   localStorage.setItem("social_cart", JSON.stringify(social_cart));
+    //   return {
+    //     ...state,
+    //     social_cart: social_cart,
+    //   };
     case "UPDATE_SEARCH_PARAMS":
       return {
         ...state,
         currentParams: action.payload,
+      };
+    case "UPDATE_PLAN_MODAL":
+      return {
+        ...state,
+        plan_modal: { ...state.plan_modal, ...action.payload },
       };
 
     default:

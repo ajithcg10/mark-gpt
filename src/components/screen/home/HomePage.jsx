@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
+
 import { styled } from "styled-components";
-import NavBar from "../../inculeds/NavBar";
+import PlanModal from "../../inculeds/PlanModal";
 import HomeSideBar from "../../inculeds/HomeSideBar";
 import { Link } from "react-router-dom";
 import { TiThMenu } from "react-icons/ti";
@@ -8,41 +9,55 @@ import MobileSideBar from "../../inculeds/MobileSideBar";
 
 export default function HomePage() {
   const [show, SetShow] = useState(false);
+  const [isPlan, setPlan] = useState(false);
+
+  useEffect(() => {
+    const hasPageRefreshed = localStorage.getItem("hasPageRefreshed");
+
+    if (!hasPageRefreshed) {
+      localStorage.setItem("hasPageRefreshed", "true");
+      localStorage.removeItem("segment_data");
+      window.location.reload();
+    }
+  }, []);
 
   return (
-    <Container>
-      <HomeSideBar />
-      <MobileSideBar show={show} SetShow={SetShow} />
-      <MobileMenuIcon onClick={() => SetShow(true)}>
-        <TiThMenu />
-      </MobileMenuIcon>
-      <Wrapper>
-        <Box>
-          <TopSection>
-            <Title>
-              Mark<Span>GPT</Span>
-            </Title>
-            <Create>
-              Welcome to MarkGPT, we help you to get the best marketing
-              strategies and contents{" "}
-            </Create>
-          </TopSection>
-          <BottomConatiner>
-            <Link to="/business">
-              <SectionConatiner>
-                <Next>Start new conversation</Next>
+    localStorage.getItem("hasPageRefreshed") && (
+      <Container>
+        <HomeSideBar setPlan={setPlan} />
+        <MobileSideBar show={show} SetShow={SetShow} />
+        <MobileMenuIcon onClick={() => SetShow(true)}>
+          <TiThMenu />
+        </MobileMenuIcon>
+        <Wrapper>
+          <Box>
+            <TopSection>
+              <Title>
+                Mark<Span>GPT</Span>
+              </Title>
+              <Create>
+                Welcome to MarkGPT, we help you to get the best marketing
+                strategies and contents{" "}
+              </Create>
+            </TopSection>
+            <BottomConatiner>
+              <Link to="/business">
+                <SectionConatiner>
+                  <Next>Setup your business</Next>
 
-                {/* <ArroConatiner>
+                  {/* <ArroConatiner>
                   <Arrow
                     src={require("../../../assets/image/business/Arrow.png")}
                   />
                 </ArroConatiner> */}
-              </SectionConatiner>
-            </Link>
-          </BottomConatiner>
-        </Box>
-      </Wrapper>
-    </Container>
+                </SectionConatiner>
+              </Link>
+            </BottomConatiner>
+          </Box>
+        </Wrapper>
+        <PlanModal isPlan={isPlan} setPlan={setPlan} />
+      </Container>
+    )
   );
 }
 const Container = styled.div`
@@ -139,12 +154,4 @@ const Next = styled.h5`
   @media (max-width: 980px) {
     font-size: 14px;
   }
-`;
-const ArroConatiner = styled.div`
-  margin-left: 6px;
-  width: 20px;
-`;
-const Arrow = styled.img`
-  display: block;
-  width: 100%;
 `;

@@ -1,111 +1,213 @@
-import React, { useEffect, useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { MyContext } from "../../contexts/Context";
+import axios from "axios";
 import { styled } from "styled-components";
 import NavBar from "../../inculeds/NavBar";
 import HomeSideBar from "../../inculeds/HomeSideBar";
-import { Link } from "react-router-dom";
-import { MyContext } from "../../contexts/Context";
+import PlanModal from "../../inculeds/PlanModal";
+import { RotatingTriangles } from "react-loader-spinner";
 import { TiThMenu } from "react-icons/ti";
 import MobileSideBar from "../../inculeds/MobileSideBar";
+import { nav } from "../../helpers/NavMenu";
 
 export default function SocialSinglePage() {
   const [show, SetShow] = useState(false);
+  const [table, setTableData] = useState();
   const {
-    state: { social_media, social_cart },
+    state: { social_media, social_cart, social_data, user_data },
     dispatch,
   } = useContext(MyContext);
 
-  let store = social_media.filter((item) =>
-    social_cart.includes(item.social_name)
+  const style = {
+    position: "fixed",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+  };
+  nav.map((i) => {
+    return (
+      (i.segment_verifyed = 2),
+      (i.business_verifyed = 1),
+      (i.point_verifyed = 3),
+      (i.landing_verifyed = 4)
+    );
+  });
+
+  const filteredData = social_data?.social_cart;
+
+  // let data = segment_data?.segment?.add_points;
+
+  const formData = new FormData();
+  formData.append("social_media", filteredData);
+
+  const content = social_data?.add_points;
+
+  useEffect(() => {
+    if (content) {
+      const makePostRequest = async () => {
+        const url = "http://api.markgpt.ai/api/v1/accounts/prompt/"; // Replace with your API URL
+        const bearerToken = user_data?.access_token; // Replace with your actual Bearer token
+
+        try {
+          const response = await axios.post(url, formData, {
+            headers: {
+              Authorization: `Bearer ${bearerToken}`,
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (response.data.StatusCode == 6000) {
+            dispatch({
+              type: "UPDATE_SOCIAL_DATA",
+              payload: {
+                add_table: response.data.data,
+              },
+            });
+          }
+
+          // Handle the response data here (e.g., update state, display messages, etc.)
+        } catch (error) {
+          // Handle errors here
+          console.error("Error making the API call:", error);
+        }
+      };
+      makePostRequest();
+    }
+  }, [content]);
+
+  let store = social_media?.filter((item) =>
+    filteredData?.includes(item.social_name)
   );
 
-  return (
-    <Container>
-      <HomeSideBar />
-      <MobileSideBar show={show} SetShow={SetShow} />
-      <MobileMenuIcon onClick={() => SetShow(true)}>
-        <TiThMenu />
-      </MobileMenuIcon>
-      <Wrapper>
-        <NavBar />
-        <Box>
-          <TopSection>
-            <Title>Social media content</Title>
-            <SavebuttonContainer>
-              <SaveIconConatiner>
-                <SaveIcone
-                  src={require("../../../assets/image/social/save.png")}
-                />
-              </SaveIconConatiner>
-              <SaveButtonName>Save output</SaveButtonName>
-            </SavebuttonContainer>
-          </TopSection>
-          {store.map((i) => {
-            return (
-              <CenterSection>
-                <TopDiv>
-                  <SocialContentContainer>
-                    <SociaTitle>{i.social_name}</SociaTitle>
-                    <SocialContainer>
-                      <Item>
-                        <SocialIconContainer>
-                          <SocailIcon src={i.social_image} />
-                        </SocialIconContainer>
-                      </Item>
-                    </SocialContainer>
-                  </SocialContentContainer>
+  useEffect(() => {
+    async function fetchSocial_Data() {
+      let promise = new Promise((resolve, reject) => {
+        let social_data = localStorage.getItem("social_data");
+        social_data = JSON.parse(social_data);
 
-                  <CopyButtonConatiner>
-                    <CopyButtonName>Copy</CopyButtonName>
-                    <IconContainer>
-                      <CopyIcon
-                        src={require("../../../assets/image/landing/copy.png")}
-                      />
-                    </IconContainer>
-                  </CopyButtonConatiner>
-                </TopDiv>
-                <CenterDiv>
-                  <SubTitle>Ad Copies</SubTitle>
-                  <Ul>
-                    {i.add_copies.map((p) => {
-                      return <Li>{p}</Li>;
-                    })}
-                  </Ul>
-                </CenterDiv>
-                <BottomDiv>
-                  <BottomTitle>Calendar</BottomTitle>
-                  <MainConatiner>
-                    <Table>
-                      <Thead>
-                        <Tr>
-                          <Th className="data">Sl no</Th>
-                          <Th className="data">Date</Th>
-                          <Th className="data">Content type</Th>
-                          <Th className="data">Topic</Th>
-                          <Th className="data">Metrics to track</Th>
-                        </Tr>
-                      </Thead>
-                      <Tbody>
-                        {i.calendar.map((item) => (
-                          <Tr>
-                            <Td data-title="Sl no">{item.Sl_no}</Td>
-                            <Td data-title="Date">{item.date}</Td>
-                            <Td data-title="Content type">
-                              {item.content_type}
-                            </Td>
-                            <Td data-title="Topic">{item.topic}</Td>
-                            <Td data-title="Metrics to track">{item.track}</Td>
-                          </Tr>
-                        ))}
-                      </Tbody>
-                    </Table>
-                  </MainConatiner>
-                </BottomDiv>
-              </CenterSection>
-            );
-          })}
-        </Box>
-      </Wrapper>
-    </Container>
+        dispatch({
+          type: "UPDATE_SOCIAL_DATA",
+          payload: { ...social_data },
+        });
+      });
+
+      let result = await promise;
+    }
+
+    fetchSocial_Data();
+  }, []);
+
+  return (
+    <>
+      {content ? (
+        <Container>
+          <HomeSideBar />
+          <MobileSideBar show={show} SetShow={SetShow} />
+          <MobileMenuIcon onClick={() => SetShow(true)}>
+            <TiThMenu />
+          </MobileMenuIcon>
+          <Wrapper>
+            <NavBar />
+            <Box>
+              <TopSection>
+                <Title>Social media content</Title>
+                <SavebuttonContainer>
+                  <SaveIconConatiner>
+                    <SaveIcone
+                      src={require("../../../assets/image/social/save.png")}
+                    />
+                  </SaveIconConatiner>
+                  <SaveButtonName>Save output</SaveButtonName>
+                </SavebuttonContainer>
+              </TopSection>
+              {store.map((i) => {
+                return (
+                  <CenterSection>
+                    <TopDiv>
+                      <SocialContentContainer>
+                        <SociaTitle>{i.social_name}</SociaTitle>
+                        <SocialContainer>
+                          <Item>
+                            <SocialIconContainer>
+                              <SocailIcon src={i.social_image} />
+                            </SocialIconContainer>
+                          </Item>
+                        </SocialContainer>
+                      </SocialContentContainer>
+
+                      <CopyButtonConatiner>
+                        <CopyButtonName>Copy</CopyButtonName>
+                        <IconContainer>
+                          <CopyIcon
+                            src={require("../../../assets/image/landing/copy.png")}
+                          />
+                        </IconContainer>
+                      </CopyButtonConatiner>
+                    </TopDiv>
+                    <CenterDiv>
+                      <SubTitle>Ad Copies</SubTitle>
+                      <Ul>
+                        {content?.map((p) => {
+                          return <Li>{p}</Li>;
+                        })}
+                      </Ul>
+                    </CenterDiv>
+                    <BottomDiv>
+                      <BottomTitle>Calendar</BottomTitle>
+                      {/* <div
+                        dangerouslySetInnerHTML={{
+                          __html: social_data?.add_table,
+                        }}
+                      /> */}
+                      {/* <MainConatiner>
+                        <Table>
+                          <Thead>
+                            <Tr>
+                              <Th className="data">Sl no</Th>
+                              <Th className="data">Date</Th>
+                              <Th className="data">Content type</Th>
+                              <Th className="data">Topic</Th>
+                              <Th className="data">Metrics to track</Th>
+                            </Tr>
+                          </Thead>
+                          <Tbody>
+                            {i.calendar.map((item) => (
+                              <Tr>
+                                <Td data-title="Sl no">{item.Sl_no}</Td>
+                                <Td data-title="Date">{item.date}</Td>
+                                <Td data-title="Content type">
+                                  {item.content_type}
+                                </Td>
+                                <Td data-title="Topic">{item.topic}</Td>
+                                <Td data-title="Metrics to track">
+                                  {item.track}
+                                </Td>
+                              </Tr>
+                            ))}
+                          </Tbody>
+                        </Table>
+                      </MainConatiner> */}
+                    </BottomDiv>
+                  </CenterSection>
+                );
+              })}
+            </Box>
+          </Wrapper>
+          <PlanModal />
+        </Container>
+      ) : (
+        <div style={style}>
+          <RotatingTriangles
+            visible={true}
+            height="100"
+            width="100"
+            ariaLabel="rotating-triangels-loading"
+            wrapperStyle={{}}
+            wrapperClass="rotating-triangels-wrapper"
+          />
+        </div>
+      )}
+    </>
   );
 }
 const Container = styled.div`

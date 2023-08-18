@@ -42,32 +42,15 @@ export default function MainRouter() {
     fetchUserData();
   }, []);
 
-  useEffect(() => {
-    async function fetchSegment_Data() {
-      let promise = new Promise((resolve, reject) => {
-        let segment_data = localStorage.getItem("segment_data");
-        segment_data = JSON.parse(segment_data);
-
-        dispatch({
-          type: "UPDATE_SEGMENT_DATA",
-          payload: { ...segment_data },
-        });
-      });
-
-      let result = await promise;
-    }
-
-    fetchSegment_Data();
-  }, []);
   // useEffect(() => {
   //   async function fetchSocial_Data() {
   //     let promise = new Promise((resolve, reject) => {
   //       let social_cart = localStorage.getItem("social_cart");
-  //       social_cart = JSON.parse(social_cart);
+  //       segment_data = JSON.parse(segment_data);
 
   //       dispatch({
   //         type: "Add_Social",
-  //         payload: { ...social_cart },
+  //         payload: { ...segment_data },
   //       });
   //     });
 

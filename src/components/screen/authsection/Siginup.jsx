@@ -1,10 +1,74 @@
 import React, { useState } from "react";
+import axios from "axios";
+
 import { styled } from "styled-components";
 import { useNavigate } from "react-router-dom";
+import ButtonLoader from "../../inculeds/ButtonLoader";
 
 export default function Siginup() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setLoading] = useState(false);
+
+  const [isError, setError] = useState(false);
+
+  const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [password, setPassword] = useState("");
+  const [repassword, setRePassword] = useState("");
+  const formData = new FormData();
+  formData.append("email", email);
+  formData.append("password", password);
+  formData.append("first_name", firstName);
+  formData.append("last_name", lastName);
+
+  const handleSubmit = async (event) => {
+    if (
+      firstName.length !== 0 &&
+      // lastName.length !== 0 &&
+      email.length !== 0 &&
+      password.length !== 0 &&
+      repassword.length !== 0 &&
+      password === repassword
+    ) {
+      setLoading(true);
+      try {
+        // Replace 'YOUR_API_ENDPOINT' with your actual API endpoint URL
+        const response = await axios.post(
+          "http://api.markgpt.ai/api/v1/accounts/sign_up/",
+          formData
+        );
+        if (response.data.StatusCode === 6000) {
+          setLoading(true);
+          navigate("/auth/signin", { replace: true });
+
+          // dispatch({
+          //   type: "UPDATE_USER_DATA",
+          //   payload: {
+          //     is_verified: true,
+          //     access_token: response.data.data.access,
+          //     name: email,
+          //   },
+          // });
+        }
+        if (response.data.StatusCode === 6001) {
+          setLoading(false);
+        }
+      } catch (error) {
+        console.log("Error:", error);
+        setLoading(false);
+      }
+    } else {
+      setError(true);
+    }
+  };
+  setTimeout(() => {
+    if (isError) {
+      setError(false);
+    }
+  }, 5000);
+
   return (
     <div>
       <Container>
@@ -24,22 +88,49 @@ export default function Siginup() {
                   <NameSection>
                     <FirstNAme>
                       <Label>First name</Label>
-                      <InputName type="text" />
+                      <InputName
+                        type="text"
+                        onChange={(e) => setFirstName(e.target.value)}
+                        value={firstName}
+                      />
+                      {isError && firstName.length === 0 ? (
+                        <ErrorMsg>This field is required</ErrorMsg>
+                      ) : null}
                     </FirstNAme>
+
                     <LastName>
                       <Label>Last name</Label>
-                      <InputLastName type="text" />
+                      <InputLastName
+                        type="text"
+                        onChange={(e) => setLastName(e.target.value)}
+                        value={lastName}
+                      />
+                      {isError && lastName.length === 0 ? (
+                        <ErrorMsg>This field is required</ErrorMsg>
+                      ) : null}
                     </LastName>
                   </NameSection>
                 </Form>
                 <SingleForm>
                   <InputConatiner>
                     <Label>Email</Label>
-                    <Input type="email" />
+                    <Input
+                      type="email"
+                      onChange={(e) => setEmail(e.target.value)}
+                      value={email}
+                    />
+                    {isError && email.length === 0 ? (
+                      <ErrorMsg>This field is required</ErrorMsg>
+                    ) : null}
                   </InputConatiner>
+
                   <InputConatiner>
                     <Label>Set Password</Label>
-                    <Input type={showPassword ? "text" : "password"} />
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      onChange={(e) => setPassword(e.target.value)}
+                      value={password}
+                    />
                     <ShowPassword
                       onClick={() => setShowPassword(!showPassword)}
                     >
@@ -48,10 +139,17 @@ export default function Siginup() {
                         src={require("../../../assets/image/authsection/Iconly.png")}
                       />
                     </ShowPassword>
+                    {isError && password.length === 0 ? (
+                      <ErrorMsg>This field is required</ErrorMsg>
+                    ) : null}
                   </InputConatiner>
                   <InputConatiner>
                     <Label>Re enter password</Label>
-                    <Input type={showPassword ? "text" : "password"} />
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      onChange={(e) => setRePassword(e.target.value)}
+                      value={repassword}
+                    />
                     <ShowPassword
                       onClick={() => setShowPassword(!showPassword)}
                     >
@@ -60,12 +158,16 @@ export default function Siginup() {
                         src={require("../../../assets/image/authsection/Iconly.png")}
                       />
                     </ShowPassword>
+                    {isError && repassword.length === 0 ? (
+                      <ErrorMsg>This field is required</ErrorMsg>
+                    ) : null}
                   </InputConatiner>
                 </SingleForm>
               </FormTitle>
-              <ButtonContainer>
-                <Content>Signup</Content>
+              <ButtonContainer onClick={() => handleSubmit()}>
+                <Content> {isLoading ? <ButtonLoader /> : "Sign Up"}</Content>
               </ButtonContainer>
+
               <GoggleContainer>
                 <Facilty>Or signup using</Facilty>
                 <ChooseAuth>
@@ -94,7 +196,7 @@ export default function Siginup() {
         </BottomConatiner>
         <Signin>
           Already have an account?
-          <Span onClick={() => navigate("/signin", { replace: true })}>
+          <Span onClick={() => navigate("/auth/signin", { replace: true })}>
             {" "}
             Sign in
           </Span>
@@ -131,6 +233,15 @@ const Box = styled.div`
   height: 3;
   padding: 40px;
   text-align: initial;
+  @media (max-width: 768px) {
+    width: 550px;
+  }
+  @media (max-width: 640px) {
+    width: 90%;
+  }
+  @media (max-width: 480px) {
+    padding: 20px;
+  }
 `;
 const TopSection = styled.div`
   margin-bottom: 30px;
@@ -159,19 +270,36 @@ const NameSection = styled.div`
   display: flex;
   width: 100%;
   margin-bottom: 30px;
+  @media (max-width: 480px) {
+    flex-wrap: wrap;
+  }
+`;
+const ErrorMsg = styled.p`
+      position: absolute;
+    font-size: 13px;
+   color: #1e91e3;
+    left: 0;
+    bottom: -24px;
+}
 `;
 const FirstNAme = styled.div`
   display: flex;
   //   background: aqua;
+  position: relative;
   width: 100%;
 
   margin-right: 10px;
 
   //   border-bottom: 1px solid #8e98a3;
   flex-direction: column;
+  @media (max-width: 480px) {
+    margin-right: 0px;
+    margin-bottom: 30px;
+  }
 `;
 const LastName = styled.div`
   display: flex;
+  position: relative;
   //   background: aqua;
   //   border-bottom: 1px solid #8e98a3;
   width: 100%;
@@ -184,13 +312,13 @@ const Label = styled.label`
 `;
 const InputName = styled.input`
   border-bottom: 1px solid #8e98a3;
-  text-align: center;
+  text-align: left;
   &: focus {
     border-bottom: 1px solid #1e91e3;
   }
 `;
 const InputLastName = styled.input`
-  text-align: center;
+  text-align: left;
   border-bottom: 1px solid #8e98a3;
   &: focus {
     border-bottom: 1px solid #1e91e3;
@@ -208,10 +336,11 @@ const InputConatiner = styled.div`
 
   width: 100%;
   flex-direction: column;
+  margin-bottom: 30px;
 `;
 
 const Input = styled.input`
-  text-align: center;
+  text-align: left;
   border-bottom: 1px solid #8e98a3;
   &: focus {
     border-bottom: 1px solid #1e91e3;
@@ -244,6 +373,7 @@ const Content = styled.div`
 const GoggleContainer = styled.div`
   display: flex;
   width: 100%;
+  cursor: pointer;
   justify-content: center;
   align-items: center;
 `;
@@ -251,6 +381,9 @@ const Facilty = styled.div`
   margin-right: 10px;
   color: #c6ccd2;
   font-size: 14px;
+  @media (max-width: 480px) {
+    margin-right: 5px;
+  }
 `;
 const ChooseAuth = styled.div`
   display: flex;
@@ -269,4 +402,5 @@ const Image = styled.img`
 const Signin = styled.h5`
   color: #c6ccd2;
   margin-top: 30px;
+  cursor: pointer;
 `;

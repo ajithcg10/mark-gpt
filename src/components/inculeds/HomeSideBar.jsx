@@ -1,14 +1,18 @@
-import React, { useContext, useEffect, useState } from "react";
-
+import React, { useContext } from "react";
 import { styled } from "styled-components";
 import { Link } from "react-router-dom";
 import { MyContext } from "../contexts/Context";
 
 export default function HomeSideBar() {
   const {
-    state: { user_data },
+    state: { user_data, segment_data },
     dispatch,
   } = useContext(MyContext);
+
+  const handle = () => {
+    localStorage.removeItem("social_data");
+    localStorage.removeItem("segment_data");
+  };
 
   return (
     <Container>
@@ -16,32 +20,54 @@ export default function HomeSideBar() {
         <Title>
           Mark<Span>GPT</Span>
         </Title>
-        <HomeSection>
-          <Link to="/">
-            <HomeConatiner>
-              <HomeIconContainer>
-                <LineDiv>e</LineDiv>
-                <HomeIconSection>
-                  <HomeIcon
-                    src={require("../../assets/image/dashborad/home.png")}
-                  />
-                </HomeIconSection>
-              </HomeIconContainer>
-              <HomeContent>Home</HomeContent>
-            </HomeConatiner>
-          </Link>
-          <HistoryConatiner>
-            <HistoryIconContainer>
-              <HistoryIcon
-                src={require("../../assets/image/dashborad/history.png")}
-              />
-            </HistoryIconContainer>
-            <HistoryContent>Search history</HistoryContent>
-          </HistoryConatiner>
-        </HomeSection>
+        {segment_data.business ? (
+          <HomeSection>
+            <Link to="/">
+              <HomeConatiner onClick={() => handle()}>
+                <HomeIconContainer>
+                  {/* <LineDiv>e</LineDiv> */}
+                  <HomeIconSection>
+                    <HomeIcon src={require("../../assets/image/found.png")} />
+                  </HomeIconSection>
+                </HomeIconContainer>
+                <Content>
+                  <HomeContent>{segment_data.business.business}</HomeContent>
+                  <Industry>{segment_data.business.industry}</Industry>
+                </Content>
+                <DownloadImage>
+                  <Img src={require("../../assets/image/download.png")} />
+                </DownloadImage>
+              </HomeConatiner>
+            </Link>
+            {/* <HistoryConatiner>
+              <HistoryIconContainer>
+                <HistoryIcon
+                  src={require("../../assets/image/dashborad/history.png")}
+                />
+              </HistoryIconContainer>
+              <HistoryContent>Search history</HistoryContent>
+            </HistoryConatiner> */}
+          </HomeSection>
+        ) : (
+          <HomeSection>
+            <Img
+              src={require("../../assets/image/no_found.png")}
+              alt="No Found"
+            />
+          </HomeSection>
+        )}
       </TopSection>
       <BottomSection>
-        <UpgradeConatiner>
+        <UpgradeConatiner
+          onClick={() =>
+            dispatch({
+              type: "UPDATE_PLAN_MODAL",
+              payload: {
+                isPlan: true,
+              },
+            })
+          }
+        >
           <UpgradeIconContainer>
             <UpgradeIcon
               src={require("../../assets/image/dashborad/Support.png")}
@@ -81,7 +107,7 @@ const Container = styled.div`
   border-right: 1px solid #212f41;
   background: rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(4px);
-  width: 250px;
+  width: 350px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -104,6 +130,10 @@ const Span = styled.span`
   font-family: "gordita_medium";
 `;
 const HomeSection = styled.div``;
+const Img = styled.img`
+  display: block;
+  width: 100%;
+`;
 const HomeConatiner = styled.div`
   display: flex;
   cursor: pointer;
@@ -111,25 +141,22 @@ const HomeConatiner = styled.div`
   padding: 10px;
   border-radius: 8px;
   background: #f8f8f8;
-  height: 50px;
+  position: relative;
+  height: 60px;
 `;
-const LineDiv = styled.h6`
-  border: 0.1px solid rgba(30, 145, 227, 1);
-  background: rgba(30, 145, 227, 1);
-  text-indent: 100%;
-  white-space: nowrap;
-  margin-right: 10px;
-  overflow: hidden;
-  width: 5px;
-  height: 35px;
-  border-radius: 5px;
-`;
+
 const HomeIconContainer = styled.div`
   display: flex;
   align-items: center;
 `;
 const HomeIcon = styled.img`
   display: block;
+`;
+const Content = styled.div``;
+const DownloadImage = styled.div`
+  position: absolute;
+  right: 10px;
+  top: 10px;
 `;
 const HomeContent = styled.h5`
   color: rgba(30, 145, 227, 1);
@@ -138,30 +165,13 @@ const HomeContent = styled.h5`
     font-size: 14px;
   }
 `;
-const HistoryConatiner = styled.div`
-  display: flex;
-  cursor: pointer;
-  align-items: center;
-  padding: 10px;
-  margin-top: 10px;
-  border-radius: 8px;
-  border: 1px solid rgba(248, 248, 248, 0.1);
-  height: 50px;
+const Industry = styled.h5`
+  color: rgba(97, 105, 114, 1);
+  font-size: 14px;
 `;
-const HistoryIconContainer = styled.div`
-  margin-right: 30px;
-`;
+
 const HomeIconSection = styled.div`
   margin-right: 19px;
-`;
-const HistoryIcon = styled.img`
-  display: block;
-`;
-const HistoryContent = styled.h5`
-  font-family: "gordita_medium";
-  @media (max-width: 980px) {
-    font-size: 14px;
-  }
 `;
 
 const BottomSection = styled.div``;

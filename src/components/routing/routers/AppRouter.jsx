@@ -6,6 +6,7 @@ const LazyHome = React.lazy(() => import("../../screen/home/HomePage"));
 const LazyBusiness = React.lazy(() => import("../../screen/business/Business"));
 const LazySegments = React.lazy(() => import("../../screen/segments/Segments"));
 const LazyPoints = React.lazy(() => import("../../screen/painpoints/Points"));
+const LazyPage = React.lazy(() => import("../../inculeds/PageNotFound.jsx"));
 const LazyLanding = React.lazy(() =>
   import("../../screen/landinpage/LandingPage")
 );
@@ -49,6 +50,7 @@ export default function AppRouter() {
         <Route path="/landing" element={<LazyLanding />} />
         <Route path="/social" element={<LazySocailMediaListPage />} />
         <Route path="/socialmedia" element={<LazySocialSinglePage />} />
+        <Route path="/*" element={<LazyPage />} />
       </Routes>
     </Suspense>
   );

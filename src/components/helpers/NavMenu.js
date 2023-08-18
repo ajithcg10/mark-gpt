@@ -2,26 +2,26 @@ export const nav = [
   {
     id: 1,
     menu_name: "Bussines dettails",
-    menu_verifyed: false,
+    business_verifyed: 0,
   },
   {
     id: 2,
     menu_name: "Segment",
-    menu_verifyed: false,
+    segment_verifyed: 0,
   },
   {
     id: 3,
     menu_name: "Pain points",
-    menu_verifyed: false,
+    point_verifyed: 0,
   },
   {
     id: 4,
     menu_name: "Landing page",
-    menu_verifyed: false,
+    landing_verifyed: 0,
   },
   {
     id: 5,
     menu_name: "Social media",
-    menu_verifyed: false,
+    menu_verifyed: 0,
   },
 ];

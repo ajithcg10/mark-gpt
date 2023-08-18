@@ -1,22 +1,26 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { MyContext } from "../../contexts/Context";
-import axios from "axios";
 import { styled } from "styled-components";
 import NavBar from "../../inculeds/NavBar";
 import HomeSideBar from "../../inculeds/HomeSideBar";
 import { Link } from "react-router-dom";
 import TypingEffect from "../../helpers/TypingEffect";
-import { landing_page_data } from "../../helpers/Object";
 import { TiThMenu } from "react-icons/ti";
 import MobileSideBar from "../../inculeds/MobileSideBar";
-import CanvasRenderer from "../../helpers/CanvasRenderer";
-import DOMPurify from "dompurify"; // Import DOMPurify
 import { RotatingTriangles } from "react-loader-spinner";
+import { nav } from "../../helpers/NavMenu";
+import PlanModal from "../../inculeds/PlanModal";
 
 export default function LandingPage() {
   const [show, SetShow] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [htmlContent, setHtmlContent] = useState("");
+  nav.map((i) => {
+    return (
+      (i.segment_verifyed = 2),
+      (i.business_verifyed = 1),
+      (i.point_verifyed = 3)
+    );
+  });
 
   const style = {
     position: "fixed",
@@ -25,11 +29,9 @@ export default function LandingPage() {
     transform: "translate(-50%, -50%)",
   };
   const {
-    state: { user_data, segment_data },
+    state: { segment_data },
     dispatch,
   } = useContext(MyContext);
-
-  const [content, setContent] = useState([]);
 
   let text = TypingEffect(segment_data?.landing_page, 70);
 
@@ -46,6 +48,23 @@ export default function LandingPage() {
       });
   };
 
+  useEffect(() => {
+    async function fetchSegment_Data() {
+      let promise = new Promise((resolve, reject) => {
+        let segment_data = localStorage.getItem("segment_data");
+        segment_data = JSON.parse(segment_data);
+
+        dispatch({
+          type: "UPDATE_SEGMENT_DATA",
+          payload: { ...segment_data },
+        });
+      });
+
+      let result = await promise;
+    }
+
+    fetchSegment_Data();
+  }, []);
   // const htmlContent = jsonString?.landing_page?.[""]?.join("") || "";
   // console.log(htmlContent, "htmlContenthtmlContent");
 
@@ -104,6 +123,7 @@ export default function LandingPage() {
               </Link>
             </Box>
           </Wrapper>
+          <PlanModal />
         </Container>
       ) : (
         <div style={style}>
@@ -216,35 +236,35 @@ const CopyIcon = styled.img`
   display: block;
 `;
 const DecriptionContainer = styled.div``;
-const HeadLine = styled.h5`
-  width: 100%;
-  margin-bottom: 10px;
-  text-align: left;
-  font-size: 14px;
-  color: #1e91e3;
-  @media (max-width: 768px) {
-    font-size: 13px;
-  }
-`;
-const SubHeadLine = styled.h5`
-  width: 100%;
-  text-align: left;
-  margin-bottom: 10px;
-  font-size: 14px;
-  color: #1e91e3;
-  @media (max-width: 768px) {
-    font-size: 13px;
-  }
-`;
-const Decription = styled.p`
-  width: 100%;
-  text-align: left;
+// const HeadLine = styled.h5`
+//   width: 100%;
+//   margin-bottom: 10px;
+//   text-align: left;
+//   font-size: 14px;
+//   color: #1e91e3;
+//   @media (max-width: 768px) {
+//     font-size: 13px;
+//   }
+// `;
+// const SubHeadLine = styled.h5`
+//   width: 100%;
+//   text-align: left;
+//   margin-bottom: 10px;
+//   font-size: 14px;
+//   color: #1e91e3;
+//   @media (max-width: 768px) {
+//     font-size: 13px;
+//   }
+// `;
+// const Decription = styled.p`
+//   width: 100%;
+//   text-align: left;
 
-  color: #d5d5d5;
-  @media (max-width: 768px) {
-    font-size: 14px;
-  }
-`;
+//   color: #d5d5d5;
+//   @media (max-width: 768px) {
+//     font-size: 14px;
+//   }
+// `;
 const ButtonContainer = styled.div`
   display: flex;
   align-items: center;

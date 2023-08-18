@@ -1,49 +1,56 @@
-import React, { useContext, useEffect, useState } from "react";
-import { styled } from "styled-components";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import React, { useContext, useState } from "react";
 import axios from "axios";
 import { MyContext } from "../../contexts/Context";
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { styled } from "styled-components";
+import ButtonLoader from "../../inculeds/ButtonLoader";
 export default function SignPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
-
+  const [isError, setError] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const {
-    state: { user_data },
-    dispatch,
-  } = useContext(MyContext);
-  console.log(user_data, "jjj");
+  const { dispatch } = useContext(MyContext);
+
   const formData = new FormData();
   formData.append("email", email);
   formData.append("password", password);
 
   const handleSubmit = async (event) => {
-    try {
-      // Replace 'YOUR_API_ENDPOINT' with your actual API endpoint URL
-      const response = await axios.post(
-        "http://api.markgpt.ai/api/v1/accounts/sign_in/",
-        formData
-      );
-      if (response.data.StatusCode == 6000) {
-        console.log("hii");
-        dispatch({
-          type: "UPDATE_USER_DATA",
-          payload: {
-            is_verified: true,
-            access_token: response.data.data.access,
-            name: email,
-          },
-        });
+    if (email.length !== 0 && password.length !== 0) {
+      setLoading(true);
+      try {
+        const response = await axios.post(
+          "http://api.markgpt.ai/api/v1/accounts/sign_in/",
+          formData
+        );
+        if (response.data.StatusCode === 6000) {
+          dispatch({
+            type: "UPDATE_USER_DATA",
+            payload: {
+              is_verified: true,
+              access_token: response.data.data.access,
+              name: email,
+            },
+          });
+          setLoading(true);
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        setLoading(false);
       }
-
-      console.log(response.data.data.access, "hello");
-    } catch (error) {
-      console.error("Error:", error);
+    } else {
+      setError(true);
     }
   };
+  setTimeout(() => {
+    if (isError) {
+      setError(false);
+    }
+  }, 5000);
 
   return (
     <div>
@@ -68,9 +75,12 @@ export default function SignPage() {
                       onChange={(e) => setEmail(e.target.value)}
                       value={email}
                     />
+                    {isError && email.length === 0 ? (
+                      <ErrorMsg>This field is required</ErrorMsg>
+                    ) : null}
                   </InputConatiner>
                   <InputConatiner>
-                    <Label>Set Password</Label>
+                    <Label>Password</Label>
                     <Input
                       type={showPassword ? "text" : "password"}
                       onChange={(e) => setPassword(e.target.value)}
@@ -84,12 +94,17 @@ export default function SignPage() {
                         src={require("../../../assets/image/authsection/Iconly.png")}
                       />
                     </ShowPassword>
+                    {isError && password.length === 0 ? (
+                      <ErrorMsg>This field is required</ErrorMsg>
+                    ) : null}
                   </InputConatiner>
                 </SingleForm>
               </FormTitle>
               <ButtonContainer>
-                <Link to="/">
-                  <Content onClick={() => handleSubmit()}>Sign In</Content>
+                <Link>
+                  <Content onClick={() => handleSubmit()}>
+                    {isLoading ? <ButtonLoader /> : "Sign In"}
+                  </Content>
                 </Link>
               </ButtonContainer>
               <GoggleContainer>
@@ -108,7 +123,7 @@ export default function SignPage() {
         </BottomConatiner>
         <Signin>
           Dont have a account?
-          <Span onClick={() => navigate("/signup", { replace: true })}>
+          <Span onClick={() => navigate("/auth/signup/", { replace: true })}>
             {" "}
             Sign up
           </Span>
@@ -145,6 +160,16 @@ const Box = styled.div`
   height: 3;
   padding: 40px;
   text-align: initial;
+  @media (max-width: 768px) {
+    width: 550px;
+  }
+  @media (max-width: 640px) {
+    width: 90%;
+    padding: 20px;
+  }
+  @media (max-width: 480px) {
+    padding: 20px;
+  }
 `;
 const TopSection = styled.div`
   margin-bottom: 30px;
@@ -177,14 +202,14 @@ const SingleForm = styled.div`
 const InputConatiner = styled.div`
   display: flex;
   position: relative;
-  margin-bottom: 30px; //   background: aqua;
 
   width: 100%;
   flex-direction: column;
+  margin-bottom: 40px;
 `;
 
 const Input = styled.input`
-  text-align: center;
+  text-align: left;
   border-bottom: 1px solid #8e98a3;
   &: focus {
     border-bottom: 1px solid #1e91e3;
@@ -216,6 +241,7 @@ const Content = styled.div`
 `;
 const GoggleContainer = styled.div`
   display: flex;
+  cursor: pointer;
   width: 100%;
   justify-content: center;
   align-items: center;
@@ -241,5 +267,14 @@ const Image = styled.img`
 `;
 const Signin = styled.h5`
   color: #c6ccd2;
+  cursor: pointer;
   margin-top: 30px;
+`;
+const ErrorMsg = styled.p`
+      position: absolute;
+    font-size: 13px;
+   color: #1e91e3;
+    left: 0;
+    bottom: -24px;
+}
 `;

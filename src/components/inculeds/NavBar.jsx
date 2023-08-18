@@ -11,8 +11,20 @@ export default function NavBar() {
             // <Item>
             //   <NumberConatiner>
             <NavSection className={i.id == 5 ? "active" : ""}>
-              <NavConatiner>
-                <NavId>{i.id}</NavId>
+              <NavConatiner className={i.business_verifyed !== 0 && "active"}>
+                {i.id === i.business_verifyed ||
+                i.id === i.segment_verifyed ||
+                i.id === i.point_verifyed ||
+                i.id === i.landing_verifyed ? (
+                  <Image
+                    src={require("../../../src/assets/image/blue_tick.png")}
+                  />
+                ) : (
+                  <NavId className={i.business_verifyed == 0 && "active"}>
+                    {i.id}
+                  </NavId>
+                )}
+
                 <NavMenu>{i.menu_name}</NavMenu>
               </NavConatiner>
 
@@ -48,10 +60,14 @@ const Box = styled.div`
     justify-content: center;
   }
 `;
-// const Item = styled.div`
-//   width: 70%;
-// `;
-// const NumberConatiner = styled.div``;
+const ImageConatiner = styled.div`
+  position: absolute;
+  width: 32px;
+`;
+const Image = styled.img`
+  width: 100%;
+  display: block;
+`;
 const NavSection = styled.div`
   display: flex;
   align-items: center;
@@ -70,6 +86,9 @@ const NavConatiner = styled.div`
   // width:100%
   // hegiht :100%
   position: relative;
+  &.active {
+    width: 40%;
+  }
 `;
 const NavId = styled.div`
   padding: 4px 12px;
@@ -78,6 +97,9 @@ const NavId = styled.div`
   background: #1a2630;
   border-radius: 52%;
   font-size: 14px;
+  &.active {
+    background: #red;
+  }
 `;
 const NavLIne = styled.div`
   border-bottom: 1px solid rgba(142, 152, 163, 1);

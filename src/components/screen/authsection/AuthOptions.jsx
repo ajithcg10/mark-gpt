@@ -1,7 +1,12 @@
 import { styled } from "styled-components";
 import { Link } from "react-router-dom";
+import { auth, Provider } from "../../config/firbase";
+import { signInWithPopup } from "firebase/auth";
 
 export default function AuthOptions() {
+  const handleClick = () => {
+    signInWithPopup(auth, Provider).then((data) => {});
+  };
   return (
     <div>
       <Container>
@@ -18,7 +23,7 @@ export default function AuthOptions() {
             </CreateAc>
           </TopSection>
           <BottomConatiner>
-            <GoggleConatiner>
+            <GoggleConatiner onClick={() => handleClick()}>
               <GoggleAuthImage>
                 <Image
                   src={require("../../../assets/image/authsection/goggle.png")}
@@ -50,12 +55,19 @@ const Container = styled.div`
   align-items: center;
   justify-content: center;
 `;
-const Box = styled.div``;
+const Box = styled.div`
+  @media (max-width: 480px) {
+    width: 88%;
+  }
+`;
 const TopSection = styled.div``;
 const Title = styled.h1`
   font-family: gordita_medium;
   margin-bottom: 20px;
   font-size: 45px;
+  @media (max-width: 640px) {
+    font-size: 40px;
+  }
 `;
 const Span = styled.span`
   color: rgba(30, 145, 227, 1);
@@ -65,11 +77,17 @@ const CreateAc = styled.h5`
   margin-bottom: 40px;
   color: #c6ccd2;
   font-size: 18px;
+  @media (max-width: 640px) {
+    font-size: 16px;
+  }
+  @media (max-width: 480px) {
+    font-size: 14px;
+  }
 `;
 const BottomConatiner = styled.div``;
 const GoggleConatiner = styled.div`
   display: flex;
-
+  cursor: pointer;
   justify-content: center;
   align-items: center;
   width: 450px;
@@ -78,6 +96,13 @@ const GoggleConatiner = styled.div`
   border-radius: 74px;
   border: 1px solid #253644;
   background: #1a2630;
+  @media (max-width: 640px) {
+    width: 350px;
+    margin: 0 auto 20px;
+  }
+  @media (max-width: 480px) {
+    width: unset;
+  }
 `;
 const GoggleAuthImage = styled.div`
   margin-right: 6px;
@@ -94,6 +119,12 @@ const SectionConatiner = styled.div`
   width: 450px;
   margin: 0 auto;
   justify-content: center;
+  @media (max-width: 640px) {
+    width: 350px;
+  }
+  @media (max-width: 480px) {
+    width: unset;
+  }
 `;
 const LeftSection = styled.div`
   width: 300px;
