@@ -12,9 +12,9 @@ import { nav } from "../../helpers/NavMenu";
 
 export default function SocialSinglePage() {
   const [show, SetShow] = useState(false);
-  const [table, setTableData] = useState();
+
   const {
-    state: { social_media, social_cart, social_data, user_data },
+    state: { social_media, social_data, user_data },
     dispatch,
   } = useContext(MyContext);
 
@@ -45,7 +45,7 @@ export default function SocialSinglePage() {
   useEffect(() => {
     if (content) {
       const makePostRequest = async () => {
-        const url = "http://api.markgpt.ai/api/v1/accounts/prompt/"; // Replace with your API URL
+        const url = "https://api.markgpt.ai/api/v1/accounts/prompt/"; // Replace with your API URL
         const bearerToken = user_data?.access_token; // Replace with your actual Bearer token
 
         try {
@@ -56,7 +56,7 @@ export default function SocialSinglePage() {
             },
           });
 
-          if (response.data.StatusCode == 6000) {
+          if (response.data.StatusCode === 6000) {
             dispatch({
               type: "UPDATE_SOCIAL_DATA",
               payload: {
@@ -96,16 +96,34 @@ export default function SocialSinglePage() {
 
     fetchSocial_Data();
   }, []);
+  useEffect(() => {
+    async function fetchSegment_Data() {
+      let promise = new Promise((resolve, reject) => {
+        let segment_data = localStorage.getItem("segment_data");
+        segment_data = JSON.parse(segment_data);
 
+        dispatch({
+          type: "UPDATE_SEGMENT_DATA",
+          payload: { ...segment_data },
+        });
+      });
+
+      let result = await promise;
+    }
+
+    fetchSegment_Data();
+  }, []);
   return (
     <>
       {content ? (
         <Container>
-          <HomeSideBar />
-          <MobileSideBar show={show} SetShow={SetShow} />
-          <MobileMenuIcon onClick={() => SetShow(true)}>
-            <TiThMenu />
-          </MobileMenuIcon>
+          <Side>
+            <HomeSideBar />
+            <MobileSideBar show={show} SetShow={SetShow} />
+            <MobileMenuIcon onClick={() => SetShow(true)}>
+              <TiThMenu />
+            </MobileMenuIcon>
+          </Side>
           <Wrapper>
             <NavBar />
             <Box>
@@ -220,6 +238,21 @@ const Container = styled.div`
     flex-direction: column;
   }
 `;
+const Side = styled.div`
+  width: 20%;
+  @media (max-width: 1280px) {
+    width: 25%;
+  }
+  @media (max-width: 1080px) {
+    width: 30%;
+  }
+  @media (max-width: 980px) {
+    width: 35%;
+  }
+  @media (max-width: 768px) {
+    width: 40%;
+  }
+`;
 const MobileMenuIcon = styled.div`
   display: none;
 
@@ -240,8 +273,25 @@ const Wrapper = styled.div`
   display: grid;
   flex-direction: column;
   /* align-items: center; */
-  width: 100%;
+
   height: 100vh;
+  width: 80%;
+  @media (max-width: 1280px) {
+    width: 75%;
+  }
+  @media (max-width: 1080px) {
+    width: 70%;
+  }
+  @media (max-width: 980px) {
+    width: 66%;
+  }
+  @media (max-width: 768px) {
+    width: 60%;
+    align-items: center;
+  }
+  @media (max-width: 640px) {
+    width: unset;
+  }
 `;
 const Box = styled.div`
   width: 90%;
@@ -406,60 +456,60 @@ const BottomTitle = styled.h3`
     font-size: 18px;
   }
 `;
-const MainConatiner = styled.div`
-  border: 1px solid #212f41;
-  border-radius: 13px;
-`;
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-`;
-const Thead = styled.thead``;
-const Th = styled.th`
-  padding: 8px;
-  color: #949ea8;
-  width: fit-content;
-  height: fit-content;
-  @media (max-width: 1080px) {
-    font-size: 14px;
-  }
+// const MainConatiner = styled.div`
+//   border: 1px solid #212f41;
+//   border-radius: 13px;
+// `;
+// const Table = styled.table`
+//   width: 100%;
+//   border-collapse: collapse;
+// `;
+// const Thead = styled.thead``;
+// const Th = styled.th`
+//   padding: 8px;
+//   color: #949ea8;
+//   width: fit-content;
+//   height: fit-content;
+//   @media (max-width: 1080px) {
+//     font-size: 14px;
+//   }
 
-  @media (max-width: 980px) {
-    display: none;
-  }
-`;
-const Tbody = styled.tbody``;
-const Tr = styled.tr`
-  border-top: 1px solid #212f41;
-  &:last-child {
-    border-bottom: 0px solid #212f41;
-  }
-  @media (max-width: 980px) {
-    display: block;
-    border: 1px solid #303437;
-    background: rgba(255, 255, 255, 0.04);
-    &:nth-child(even) {
-      border: 1px solid #1e91e3;
-      background: #1a2630;
-    }
-  }
-`;
-const Td = styled.td`
-  padding: 8px;
-  text-align: left;
-  color: #d5d5d5;
-  @media (max-width: 1080px) {
-    font-size: 14px;
-  }
+//   @media (max-width: 980px) {
+//     display: none;
+//   }
+// `;
+// const Tbody = styled.tbody``;
+// const Tr = styled.tr`
+//   border-top: 1px solid #212f41;
+//   &:last-child {
+//     border-bottom: 0px solid #212f41;
+//   }
+//   @media (max-width: 980px) {
+//     display: block;
+//     border: 1px solid #303437;
+//     background: rgba(255, 255, 255, 0.04);
+//     &:nth-child(even) {
+//       border: 1px solid #1e91e3;
+//       background: #1a2630;
+//     }
+//   }
+// `;
+// const Td = styled.td`
+//   padding: 8px;
+//   text-align: left;
+//   color: #d5d5d5;
+//   @media (max-width: 1080px) {
+//     font-size: 14px;
+//   }
 
-  @media (max-width: 980px) {
-    padding: 0.5em;
-    text-align: right;
-    display: block;
+//   @media (max-width: 980px) {
+//     padding: 0.5em;
+//     text-align: right;
+//     display: block;
 
-    &::before {
-      content: attr(data-title) " : ";
-      float: left;
-    }
-  }
-`;
+//     &::before {
+//       content: attr(data-title) " : ";
+//       float: left;
+//     }
+//   }
+// `;

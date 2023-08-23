@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
-
 import { styled } from "styled-components";
 import { useNavigate } from "react-router-dom";
 import ButtonLoader from "../../inculeds/ButtonLoader";
+import { auth, Provider } from "../../config/firbase";
+import { signInWithPopup } from "firebase/auth";
+import { MyContext } from "../../contexts/Context";
 
 export default function Siginup() {
+  const { dispatch } = useContext(MyContext);
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setLoading] = useState(false);
@@ -36,7 +39,7 @@ export default function Siginup() {
       try {
         // Replace 'YOUR_API_ENDPOINT' with your actual API endpoint URL
         const response = await axios.post(
-          "http://api.markgpt.ai/api/v1/accounts/sign_up/",
+          "https://api.markgpt.ai/api/v1/accounts/sign_up/",
           formData
         );
         if (response.data.StatusCode === 6000) {
@@ -68,6 +71,36 @@ export default function Siginup() {
       setError(false);
     }
   }, 5000);
+
+  // firbsae auth
+  const handleClick = () => {
+    signInWithPopup(auth, Provider)
+      .then((result) => {
+        result.user.getIdToken().then((idToken) => {
+          axios
+            .post(`https://api.markgpt.ai/api/v1/accounts/firebase-signup/`, {
+              id_token: idToken,
+            })
+            .then((res) => {
+              dispatch({
+                type: "UPDATE_USER_DATA",
+                payload: {
+                  is_verified: true,
+                  access_token: res.data.access_token,
+                  name: res.data.name,
+                },
+              });
+            })
+            .catch((err) => {
+              console.error("Error sending ID token to backend:", err);
+            });
+        });
+      })
+      .catch((error) => {
+        console.error("Error with Firebase authentication:", error);
+      });
+  };
+  // firbsae auth
 
   return (
     <div>
@@ -168,7 +201,11 @@ export default function Siginup() {
                 <Content> {isLoading ? <ButtonLoader /> : "Sign Up"}</Content>
               </ButtonContainer>
 
-              <GoggleContainer>
+              <GoggleContainer
+                onClick={() => {
+                  handleClick();
+                }}
+              >
                 <Facilty>Or signup using</Facilty>
                 <ChooseAuth>
                   <SoftwearImage>
@@ -177,7 +214,7 @@ export default function Siginup() {
                       src={require("../../../assets/image/authsection/goggle.png")}
                     />
                   </SoftwearImage>
-                  <SoftwearImage>
+                  {/* <SoftwearImage>
                     <Image
                       alt="apple_icon"
                       src={require("../../../assets/image/authsection/apple.png")}
@@ -188,7 +225,7 @@ export default function Siginup() {
                       alt="microsoft"
                       src={require("../../../assets/image/authsection/microsofat.png")}
                     />
-                  </SoftwearImage>
+                  </SoftwearImage> */}
                 </ChooseAuth>
               </GoggleContainer>
             </FormSection>

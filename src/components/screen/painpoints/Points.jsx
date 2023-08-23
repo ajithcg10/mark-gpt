@@ -15,7 +15,10 @@ import { useNavigate } from "react-router-dom";
 
 export default function Points() {
   const [isLoading, setLoading] = useState(false);
+  const [isError, setError] = useState(false);
   const [show, SetShow] = useState(false);
+  const [inputPair, setInputPair] = useState("");
+  const [objectArray, setObjectArray] = useState([]);
   const style = {
     position: "fixed",
     top: "50%",
@@ -32,16 +35,10 @@ export default function Points() {
     dispatch,
   } = useContext(MyContext);
   const data = segment_data.pain_points;
-
-  const [inputPair, setInputPair] = useState("");
-  const [objectArray, setObjectArray] = useState([]);
+  console.log(data, "pain points");
 
   const handleAddPair = () => {
     const value = inputPair;
-
-    function generateId() {
-      return Math.random();
-    }
 
     const newObject = value;
 
@@ -68,9 +65,11 @@ export default function Points() {
   formData.append("pain_points", points_cart);
 
   const makePostRequest = async () => {
-    const url = "http://api.markgpt.ai/api/v1/accounts/prompt/"; // Replace with your API URL
+    const url = "https://api.markgpt.ai/api/v1/accounts/prompt/"; // Replace with your API URL
     const bearerToken = user_data.access_token; // Replace with your actual Bearer token
-
+    if (points_cart == 0) {
+      setError(true);
+    }
     if (points_cart.length != 0) {
       setLoading(true);
       try {
@@ -118,15 +117,36 @@ export default function Points() {
 
     fetchSegment_Data();
   }, []);
+
+  const pointsArray = data?.split("\n");
+
+  // Remove empty elements and trim whitespace
+  const filteredPointsArray = pointsArray.filter(
+    (point) => point.trim() !== ""
+  );
+
+  // Remove <span> tags using regular expression
+  const strippedPointsArray = filteredPointsArray.map((point) =>
+    point.replace(/<span.*?>|<\/span>/g, "")
+  );
+
+  setTimeout(() => {
+    if (isError) {
+      setError(false);
+    }
+  }, 1000);
+  console.log(isError);
   return (
     <div>
       {data ? (
         <Container>
-          <HomeSideBar />
-          <MobileSideBar show={show} SetShow={SetShow} />
-          <MobileMenuIcon onClick={() => SetShow(true)}>
-            <TiThMenu />
-          </MobileMenuIcon>
+          <Side>
+            <HomeSideBar />
+            <MobileSideBar show={show} SetShow={SetShow} />
+            <MobileMenuIcon onClick={() => SetShow(true)}>
+              <TiThMenu />
+            </MobileMenuIcon>
+          </Side>
           <Wrapper>
             <NavBar />
             <SegmentContainer>
@@ -140,7 +160,7 @@ export default function Points() {
                 <Box>
                   <Item>
                     <Sub>
-                      {data?.map((element) => {
+                      {strippedPointsArray?.map((element) => {
                         return points_cart.some((p) => p == element) ? (
                           <ValueConatiner
                             className="active"
@@ -205,6 +225,7 @@ export default function Points() {
                     <SenIcon onClick={handleAddPair}>
                       <AiOutlineSend />
                     </SenIcon>
+                    {isError && <ErrorMsg>This field is required</ErrorMsg>}
                   </InputConatiner>
                 </SegmentAddConatiner>
               </BottomConatiner>
@@ -247,6 +268,21 @@ const Container = styled.div`
     flex-direction: column;
   }
 `;
+const Side = styled.div`
+  width: 20%;
+  @media (max-width: 1280px) {
+    width: 25%;
+  }
+  @media (max-width: 1080px) {
+    width: 30%;
+  }
+  @media (max-width: 980px) {
+    width: 35%;
+  }
+  @media (max-width: 768px) {
+    width: 40%;
+  }
+`;
 const MobileMenuIcon = styled.div`
   display: none;
 
@@ -265,8 +301,24 @@ const Wrapper = styled.div`
   display: grid;
   flex-direction: column;
   /* align-items: center; */
-  width: 100%;
+
   height: 100vh;
+  width: 80%;
+  @media (max-width: 1280px) {
+    width: 75%;
+  }
+  @media (max-width: 1080px) {
+    width: 70%;
+  }
+  @media (max-width: 980px) {
+    width: 65%;
+  }
+  @media (max-width: 768px) {
+    width: 60%;
+  }
+  @media (max-width: 640px) {
+    width: unset;
+  }
 `;
 const SegmentContainer = styled.div`
   display: flex;
@@ -420,6 +472,15 @@ const InputConatiner = styled.div`
 `;
 const SenIcon = styled.div`
   cursor: pointer;
+`;
+const ErrorMsg = styled.p`
+      position: absolute;
+    font-size: 13px;
+   color: #1e91e3;
+       right: 0;
+       left: 26px;
+    bottom: -27px;
+}
 `;
 
 const SegmentValue = styled.div`

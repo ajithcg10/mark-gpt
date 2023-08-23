@@ -1,12 +1,42 @@
 import { styled } from "styled-components";
+import axios from "axios";
+import { MyContext } from "../../contexts/Context";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { auth, Provider } from "../../config/firbase";
 import { signInWithPopup } from "firebase/auth";
 
 export default function AuthOptions() {
+  const { dispatch } = useContext(MyContext);
+
   const handleClick = () => {
-    signInWithPopup(auth, Provider).then((data) => {});
+    signInWithPopup(auth, Provider)
+      .then((result) => {
+        result.user.getIdToken().then((idToken) => {
+          axios
+            .post(`https://api.markgpt.ai/api/v1/accounts/firebase-signup/`, {
+              id_token: idToken,
+            })
+            .then((res) => {
+              dispatch({
+                type: "UPDATE_USER_DATA",
+                payload: {
+                  is_verified: true,
+                  access_token: res.data.access_token,
+                  name: res.data.name,
+                },
+              });
+            })
+            .catch((err) => {
+              console.error("Error sending ID token to backend:", err);
+            });
+        });
+      })
+      .catch((error) => {
+        console.error("Error with Firebase authentication:", error);
+      });
   };
+
   return (
     <div>
       <Container>

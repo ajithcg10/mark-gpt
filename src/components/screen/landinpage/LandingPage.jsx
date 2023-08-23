@@ -65,18 +65,18 @@ export default function LandingPage() {
 
     fetchSegment_Data();
   }, []);
-  // const htmlContent = jsonString?.landing_page?.[""]?.join("") || "";
-  // console.log(htmlContent, "htmlContenthtmlContent");
 
   return (
     <div>
       {text ? (
         <Container>
-          <HomeSideBar />
-          <MobileSideBar show={show} SetShow={SetShow} />
-          <MobileMenuIcon onClick={() => SetShow(true)}>
-            <TiThMenu />
-          </MobileMenuIcon>
+          <Side>
+            <HomeSideBar />
+            <MobileSideBar show={show} SetShow={SetShow} />
+            <MobileMenuIcon onClick={() => SetShow(true)}>
+              <TiThMenu />
+            </MobileMenuIcon>
+          </Side>
           <Wrapper>
             <NavBar />
             <Box>
@@ -150,6 +150,21 @@ const Container = styled.div`
     flex-direction: column;
   }
 `;
+const Side = styled.div`
+  width: 20%;
+  @media (max-width: 1280px) {
+    width: 25%;
+  }
+  @media (max-width: 1080px) {
+    width: 30%;
+  }
+  @media (max-width: 980px) {
+    width: 35%;
+  }
+  @media (max-width: 768px) {
+    width: 40%;
+  }
+`;
 const MobileMenuIcon = styled.div`
   display: none;
 
@@ -170,8 +185,24 @@ const Wrapper = styled.div`
   display: grid;
   flex-direction: column;
   /* align-items: center; */
-  width: 100%;
+
   height: 100vh;
+  width: 80%;
+  @media (max-width: 1280px) {
+    width: 75%;
+  }
+  @media (max-width: 1080px) {
+    width: 70%;
+  }
+  @media (max-width: 980px) {
+    width: 65%;
+  }
+  @media (max-width: 768px) {
+    width: 60%;
+  }
+  @media (max-width: 640px) {
+    width: unset;
+  }
 `;
 const Box = styled.div`
   width: 90%;

@@ -10,7 +10,7 @@ export default function NavBar() {
           return (
             // <Item>
             //   <NumberConatiner>
-            <NavSection className={i.id == 5 ? "active" : ""}>
+            <NavSection className={i.id === 5 ? "active" : ""}>
               <NavConatiner className={i.business_verifyed !== 0 && "active"}>
                 {i.id === i.business_verifyed ||
                 i.id === i.segment_verifyed ||
@@ -20,7 +20,7 @@ export default function NavBar() {
                     src={require("../../../src/assets/image/blue_tick.png")}
                   />
                 ) : (
-                  <NavId className={i.business_verifyed == 0 && "active"}>
+                  <NavId className={i.business_verifyed === 0 && "active"}>
                     {i.id}
                   </NavId>
                 )}
@@ -29,7 +29,7 @@ export default function NavBar() {
               </NavConatiner>
 
               <NavLIne
-                id={i.id == 5 ? "active_line" : ""}
+                id={i.id === 5 ? "active_line" : ""}
                 className="line"
               ></NavLIne>
             </NavSection>
@@ -60,10 +60,10 @@ const Box = styled.div`
     justify-content: center;
   }
 `;
-const ImageConatiner = styled.div`
-  position: absolute;
-  width: 32px;
-`;
+// const ImageConatiner = styled.div`
+//   position: absolute;
+//   width: 32px;
+// `;
 const Image = styled.img`
   width: 100%;
   display: block;

@@ -1,5 +1,3 @@
-import React from "react";
-
 export const landing_page_data = [
   {
     id: 1,

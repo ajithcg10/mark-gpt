@@ -24,11 +24,13 @@ export default function HomePage() {
   return (
     localStorage.getItem("hasPageRefreshed") && (
       <Container>
-        <HomeSideBar setPlan={setPlan} />
-        <MobileSideBar show={show} SetShow={SetShow} />
-        <MobileMenuIcon onClick={() => SetShow(true)}>
-          <TiThMenu />
-        </MobileMenuIcon>
+        <Side>
+          <HomeSideBar setPlan={setPlan} />
+          <MobileSideBar show={show} SetShow={SetShow} />
+          <MobileMenuIcon onClick={() => SetShow(true)}>
+            <TiThMenu />
+          </MobileMenuIcon>
+        </Side>
         <Wrapper>
           <Box>
             <TopSection>
@@ -65,7 +67,10 @@ const Container = styled.div`
   width: 100%;
   height: 100vh;
   display: flex;
-  justify-content: center;
+  justify-content: end;
+`;
+const Side = styled.div`
+  width: 0%;
 `;
 const MobileMenuIcon = styled.div`
   display: none;
@@ -87,8 +92,24 @@ const Wrapper = styled.div`
   display: grid;
   flex-direction: column;
   align-items: center;
-  width: 100%;
+
   height: 100vh;
+  width: 80%;
+  @media (max-width: 1280px) {
+    width: 75%;
+  }
+  @media (max-width: 1080px) {
+    width: 70%;
+  }
+  @media (max-width: 980px) {
+    width: 66%;
+  }
+  @media (max-width: 768px) {
+    width: 60%;
+  }
+  @media (max-width: 640px) {
+    width: unset;
+  }
 `;
 const Box = styled.div`
   width: 70%;

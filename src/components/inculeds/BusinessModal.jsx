@@ -3,6 +3,7 @@ import { useContext } from "react";
 import styled, { keyframes } from "styled-components";
 import { MyContext } from "../contexts/Context";
 import { useNavigate } from "react-router-dom";
+import bg from "../../assets/image/Bg.png";
 
 export default function BusinessModal({ isModal, setModal }) {
   let navigate = useNavigate();
@@ -108,7 +109,9 @@ const Modal = styled.div`
   //   background: url("https://s3.ap-south-1.amazonaws.com/talrop.com-react-assets-bucket/taid/03-02-2022/images/modal/background.svg");
   // background-position: center;
   // background-repeat: no-repeat;
-  background: rgba(8, 11, 13, 0.24) rgba(116, 116, 116, 0.4);
+  // background: rgba(8, 11, 13, 0.24) rgba(116, 116, 116, 0.4);
+  background-image: url(${bg});
+  background-position: center;
 
   border-radius: 8px;
   border: 1px solid rgba(116, 116, 116, 0.4);

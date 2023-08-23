@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { MyContext } from "../../contexts/Context";
 import axios from "axios";
 import { styled } from "styled-components";
@@ -25,9 +25,12 @@ export default function SocialMediaListPage() {
   formData.append("social_media", social_cart);
 
   const makePostRequest = async () => {
-    const url = "http://api.markgpt.ai/api/v1/accounts/prompt/"; // Replace with your API URL
+    const url = "https://api.markgpt.ai/api/v1/accounts/prompt/"; // Replace with your API URL
     const bearerToken = user_data.access_token; // Replace with your actual Bearer token
-    if (social_cart != 0) {
+    if (social_cart.length == 0) {
+      setLoading(false);
+    }
+    if (social_cart.length !== 0) {
       setLoading(true);
       try {
         const response = await axios.post(url, formData, {
@@ -39,7 +42,7 @@ export default function SocialMediaListPage() {
         const content = response.data.data.add_points
           ?.split("\n")
           .filter((item) => item.trim() !== "");
-        if (response.data.StatusCode == 6000) {
+        if (response.data.StatusCode === 6000) {
           dispatch({
             type: "UPDATE_SOCIAL_DATA",
             payload: {
@@ -47,6 +50,7 @@ export default function SocialMediaListPage() {
               social_cart: social_cart,
             },
           });
+
           navigate("/socialmedia");
           setLoading(false);
         }
@@ -67,14 +71,32 @@ export default function SocialMediaListPage() {
       (i.landing_verifyed = 4)
     );
   });
+  useEffect(() => {
+    async function fetchSegment_Data() {
+      let promise = new Promise((resolve, reject) => {
+        let segment_data = localStorage.getItem("segment_data");
+        segment_data = JSON.parse(segment_data);
 
+        dispatch({
+          type: "UPDATE_SEGMENT_DATA",
+          payload: { ...segment_data },
+        });
+      });
+
+      let result = await promise;
+    }
+
+    fetchSegment_Data();
+  }, []);
   return (
     <Container>
-      <HomeSideBar />
-      <MobileSideBar show={show} SetShow={SetShow} />
-      <MobileMenuIcon onClick={() => SetShow(true)}>
-        <TiThMenu />
-      </MobileMenuIcon>
+      <Side>
+        <HomeSideBar />
+        <MobileSideBar show={show} SetShow={SetShow} />
+        <MobileMenuIcon onClick={() => SetShow(true)}>
+          <TiThMenu />
+        </MobileMenuIcon>
+      </Side>
       <Wrapper>
         <NavBar />
         <Box>
@@ -88,7 +110,7 @@ export default function SocialMediaListPage() {
           <CenterSection>
             <Ul>
               {social_media.map((i) => {
-                return social_cart.some((p) => p == i.social_name) ? (
+                return social_cart.some((p) => p === i.social_name) ? (
                   <Li
                     className="active"
                     onClick={() => {
@@ -154,6 +176,21 @@ const Container = styled.div`
     flex-direction: column;
   }
 `;
+const Side = styled.div`
+  width: 20%;
+  @media (max-width: 1280px) {
+    width: 25%;
+  }
+  @media (max-width: 1080px) {
+    width: 30%;
+  }
+  @media (max-width: 980px) {
+    width: 35%;
+  }
+  @media (max-width: 768px) {
+    width: 40%;
+  }
+`;
 const MobileMenuIcon = styled.div`
   display: none;
 
@@ -174,10 +211,24 @@ const Wrapper = styled.div`
   display: grid;
   flex-direction: column;
   /* align-items: center; */
-  width: 100%;
+
   height: 100vh;
+  width: 80%;
+  @media (max-width: 1280px) {
+    width: 75%;
+  }
+  @media (max-width: 1080px) {
+    width: 70%;
+  }
+  @media (max-width: 980px) {
+    width: 66%;
+  }
   @media (max-width: 768px) {
+    width: 60%;
     align-items: center;
+  }
+  @media (max-width: 640px) {
+    width: unset;
   }
 `;
 const Box = styled.div`
@@ -236,6 +287,9 @@ const Li = styled.li`
     border: 1px solid #1e91e3;
     background: rgba(8, 11, 13, 0.1);
     backdrop-filter: blur(3px);
+  }
+  @media (max-width: 980px) {
+    padding: 15px 15px;
   }
   @media (max-width: 768px) {
     padding: 12px 12px;

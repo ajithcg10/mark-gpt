@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import { Route, Routes } from "react-router";
 import AuthRouter from "./AuthRouter";
 import AuthRoute from "../route/AuthRoute";
@@ -8,10 +8,7 @@ import { useSearchParams } from "react-router-dom";
 import { MyContext } from "../../contexts/Context";
 
 export default function MainRouter() {
-  const {
-    state: { user_data, segment_data },
-    dispatch,
-  } = useContext(MyContext);
+  const { dispatch } = useContext(MyContext);
 
   const [searchParams] = useSearchParams();
   const currentParams = Object.fromEntries([...searchParams]);

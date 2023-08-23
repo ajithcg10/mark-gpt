@@ -5,6 +5,9 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { styled } from "styled-components";
 import ButtonLoader from "../../inculeds/ButtonLoader";
+import { auth, Provider } from "../../config/firbase";
+import { signInWithPopup } from "firebase/auth";
+
 export default function SignPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isError, setError] = useState(false);
@@ -24,7 +27,7 @@ export default function SignPage() {
       setLoading(true);
       try {
         const response = await axios.post(
-          "http://api.markgpt.ai/api/v1/accounts/sign_in/",
+          "https://api.markgpt.ai/api/v1/accounts/sign_in/",
           formData
         );
         if (response.data.StatusCode === 6000) {
@@ -51,6 +54,36 @@ export default function SignPage() {
       setError(false);
     }
   }, 5000);
+
+  // firbsae auth
+  const handleClick = () => {
+    signInWithPopup(auth, Provider)
+      .then((result) => {
+        result.user.getIdToken().then((idToken) => {
+          axios
+            .post(`https://api.markgpt.ai/api/v1/accounts/firebase-signup/`, {
+              id_token: idToken,
+            })
+            .then((res) => {
+              dispatch({
+                type: "UPDATE_USER_DATA",
+                payload: {
+                  is_verified: true,
+                  access_token: res.data.access_token,
+                  name: res.data.name,
+                },
+              });
+            })
+            .catch((err) => {
+              console.error("Error sending ID token to backend:", err);
+            });
+        });
+      })
+      .catch((error) => {
+        console.error("Error with Firebase authentication:", error);
+      });
+  };
+  // firbsae auth
 
   return (
     <div>
@@ -107,7 +140,11 @@ export default function SignPage() {
                   </Content>
                 </Link>
               </ButtonContainer>
-              <GoggleContainer>
+              <GoggleContainer
+                onClick={() => {
+                  handleClick();
+                }}
+              >
                 <Facilty>Or signup using</Facilty>
                 <ChooseAuth>
                   <SoftwearImage>
