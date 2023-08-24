@@ -79,7 +79,7 @@ export default function Points() {
             "Content-Type": "application/json", // Adjust the Content-Type if needed
           },
           params: {
-            prompt_no: "3",
+            prompt_no: 3,
           },
         });
         if (response.data.StatusCode == 6000) {

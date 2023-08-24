@@ -54,6 +54,9 @@ export default function SocialSinglePage() {
               Authorization: `Bearer ${bearerToken}`,
               "Content-Type": "application/json",
             },
+            params: {
+              prompt_no: 5,
+            },
           });
 
           if (response.data.StatusCode === 6000) {

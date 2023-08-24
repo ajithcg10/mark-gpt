@@ -14,7 +14,7 @@ export default function MobileSideBar({ show, SetShow }) {
   let navigate = useNavigate();
 
   const {
-    state: { user_data, segment_data },
+    state: { user_data },
     dispatch,
   } = useContext(MyContext);
 
@@ -63,6 +63,9 @@ export default function MobileSideBar({ show, SetShow }) {
           Authorization: `Bearer ${bearerToken}`,
           "Content-Type": "application/json", // Adjust the Content-Type if needed
         },
+        params: {
+          prompt_no: 1,
+        },
       });
       if (response.data.StatusCode === 6000) {
         let jsonData = {};
@@ -96,7 +99,7 @@ export default function MobileSideBar({ show, SetShow }) {
       console.error("Error making the API call:", error);
     }
   };
-
+  console.log("hiiii");
   return (
     <Container className={show && "active"}>
       <TopSection>

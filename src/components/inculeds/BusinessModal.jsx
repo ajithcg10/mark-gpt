@@ -10,7 +10,7 @@ export default function BusinessModal({ isModal, setModal }) {
   const {
     state: { segment_data },
   } = useContext(MyContext);
-
+  console.log(segment_data, "hu");
   return (
     <>
       {/* <SuccessModal isSuccess={isSuccess} setIsSuccess={setIsSuccess} /> */}

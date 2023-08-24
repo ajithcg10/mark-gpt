@@ -38,6 +38,9 @@ export default function SocialMediaListPage() {
             Authorization: `Bearer ${bearerToken}`,
             "Content-Type": "application/json", // Adjust the Content-Type if needed
           },
+          params: {
+            prompt_no: 4,
+          },
         });
         const content = response.data.data.add_points
           ?.split("\n")

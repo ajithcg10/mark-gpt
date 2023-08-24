@@ -105,7 +105,7 @@ export default function Segments() {
             Authorization: `Bearer ${bearerToken}`,
             "Content-Type": "application/json", // Adjust the Content-Type if needed
           },
-          params: { prompt_no: "2" },
+          params: { prompt_no: 2 },
         });
         if (response.data.StatusCode == 6000) {
           dispatch({

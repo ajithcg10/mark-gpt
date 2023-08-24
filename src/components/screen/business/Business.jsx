@@ -90,6 +90,9 @@ export default function Business() {
           Authorization: `Bearer ${bearerToken}`,
           "Content-Type": "application/json", // Adjust the Content-Type if needed
         },
+        params: {
+          prompt_no: 1,
+        },
       });
       if (response.data.StatusCode === 6000) {
         let jsonData = {};

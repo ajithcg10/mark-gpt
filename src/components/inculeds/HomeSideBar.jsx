@@ -20,31 +20,6 @@ export default function HomeSideBar() {
     localStorage.removeItem("segment_data");
   };
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await fetch(
-          "https://api.markgpt.ai/api/v1/accounts/prompt-history/",
-          {
-            headers: {
-              Authorization: `Bearer ${user_data.access_token}`,
-              "Content-Type": "application/json", // Adjust the Content-Type if needed
-            },
-          }
-        );
-        const jsonData = await response.json();
-        setData(jsonData?.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    }
-
-    fetchData();
-  }, []);
-  const loadMore = () => {
-    setCount((perv) => perv + 5);
-  };
-
   const formData = new FormData();
   formData.append("buisness_name", list.buisness_name);
   formData.append("industry", list.industry);
@@ -59,6 +34,9 @@ export default function HomeSideBar() {
         headers: {
           Authorization: `Bearer ${bearerToken}`,
           "Content-Type": "application/json", // Adjust the Content-Type if needed
+        },
+        params: {
+          prompt_no: 1,
         },
       });
       if (response.data.StatusCode === 6000) {
@@ -93,7 +71,35 @@ export default function HomeSideBar() {
       console.error("Error making the API call:", error);
     }
   };
-  console.log(data);
+
+  useEffect(() => {
+    if (Loading) {
+      async function fetchData() {
+        try {
+          const response = await fetch(
+            "https://api.markgpt.ai/api/v1/accounts/prompt-history/",
+            {
+              headers: {
+                Authorization: `Bearer ${user_data.access_token}`,
+                "Content-Type": "application/json", // Adjust the Content-Type if needed
+              },
+            }
+          );
+          const jsonData = await response.json();
+          setData(jsonData?.data);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      }
+
+      fetchData();
+    }
+  }, [Loading]);
+
+  const loadMore = () => {
+    setCount((perv) => perv + 5);
+  };
+
   return (
     <Container>
       <TopSection>
@@ -122,35 +128,42 @@ export default function HomeSideBar() {
           {data.slice(0, count).map((item) => {
             return (
               <Link to="/">
-                <HomeConatiner
-                  onClick={() => {
-                    setList(item);
-                    makePostRequest();
-                  }}
-                >
-                  <HomeIconContainer>
-                    {/* <LineDiv>e</LineDiv> */}
-                    <HomeIconSection>
-                      <HomeIcon src={require("../../assets/image/found.png")} />
-                    </HomeIconSection>
-                  </HomeIconContainer>
-                  {isloading && item.id == list.id ? (
-                    <Loading>Loading....</Loading>
-                  ) : (
-                    <Content>
-                      <HomeContent>{item.buisness_name}</HomeContent>
-                      <Industry>{item.industry}</Industry>
-                    </Content>
-                  )}
+                {item.buisness_name !== "undefined" && (
+                  <HomeConatiner
+                    onClick={() => {
+                      setList(item);
+                      makePostRequest();
+                    }}
+                  >
+                    <HomeIconContainer>
+                      {/* <LineDiv>e</LineDiv> */}
+                      <HomeIconSection>
+                        <HomeIcon
+                          src={require("../../assets/image/found.png")}
+                        />
+                      </HomeIconSection>
+                    </HomeIconContainer>
+                    {isloading && item.id == list.id ? (
+                      <Loading>Loading....</Loading>
+                    ) : (
+                      <Content>
+                        <HomeContent>{item.buisness_name}</HomeContent>
+                        <Industry>{item.industry}</Industry>
+                      </Content>
+                    )}
 
-                  <DownloadImage>
-                    <Img src={require("../../assets/image/download.png")} />
-                  </DownloadImage>
-                </HomeConatiner>
+                    <DownloadImage>
+                      <Img src={require("../../assets/image/download.png")} />
+                    </DownloadImage>
+                  </HomeConatiner>
+                )}
               </Link>
             );
           })}
-          <Load onClick={() => loadMore()}>Load more..</Load>
+          {data.length !== 0 && (
+            <Load onClick={() => loadMore()}>Load more..</Load>
+          )}
+
           {/* <HistoryConatiner>
               <HistoryIconContainer>
                 <HistoryIcon
