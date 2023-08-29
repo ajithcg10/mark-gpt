@@ -9,6 +9,9 @@ export default function HomeSideBar() {
   const [count, setCount] = useState(5);
   const [list, setList] = useState([]);
   const [isloading, setLoading] = useState(false);
+  const [business, setBusiness] = useState("");
+  const [industry, setIndustry] = useState("");
+  const [primary, setPrimary] = useState("");
   let navigate = useNavigate();
   const {
     state: { user_data, segment_data },
@@ -20,10 +23,21 @@ export default function HomeSideBar() {
     localStorage.removeItem("segment_data");
   };
 
+  useEffect(() => {
+    if (list.length != 0) {
+      setBusiness(list.buisness_name);
+      setIndustry(list.industry);
+      setPrimary(list.primary_function);
+    }
+  }, [list]);
+  console.log(business);
+  console.log(industry);
+  console.log(primary);
+
   const formData = new FormData();
-  formData.append("buisness_name", list.buisness_name);
-  formData.append("industry", list.industry);
-  formData.append("primary_function", list.primary_function);
+  formData.append("buisness_name", business);
+  formData.append("industry", industry);
+  formData.append("primary_function", primary);
 
   const makePostRequest = async () => {
     const url = "https://api.markgpt.ai/api/v1/accounts/prompt-detail/"; // Replace with your API URL

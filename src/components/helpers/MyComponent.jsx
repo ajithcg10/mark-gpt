@@ -1,45 +1,33 @@
-import React, { useState } from "react";
-import Pagination from "./Pagination";
+import React, { useState, useEffect } from "react";
 
-const MyComponent = () => {
-  const itemsPerPage = 10; // You can adjust the number of items to display per page
-  const [currentPage, setCurrentPage] = useState(1);
-
-  // Your list of items
-  const itemList = [
-    // Your list of items goes here
-    // Example: { id: 1, name: "Item 1" }, { id: 2, name: "Item 2" }, ...
+function MyComponent() {
+  const responses = [
+    'Young Adults (18-24): { "painPoints": [ "Tight budget but still desire to remain fashionable", "Constant pressure to show off personal style", "Lack of experience in fitment for textiles & footwear", "Struggle to keep up with the latest fashion trends" ] }',
+    'Seniors (65+): { "painPoints": [ "Desire for products that are comfortable and affordable", "Difficulty finding fashionable and age-appropriate items", "Outdated knowledge of current trends and new products", "Physical limitations that can make trying on textiles & footwear a challenge" ] }',
   ];
+  const [painPointsArray, setPainPointsArray] = useState([]);
 
-  // Calculate the total number of pages based on the items and itemsPerPage
-  const totalPages = Math.ceil(itemList.length / itemsPerPage);
+  useEffect(() => {
+    const combinedPainPoints = responses.reduce((accumulator, response) => {
+      const jsonStartIndex = response.indexOf("{");
+      const jsonData = JSON.parse(response.slice(jsonStartIndex));
+      return accumulator.concat(jsonData.painPoints);
+    }, []);
+    setPainPointsArray(combinedPainPoints);
+  }, []);
 
-  // Get the current page's items
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = itemList.slice(indexOfFirstItem, indexOfLastItem);
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
+  console.log(painPointsArray, "array");
 
   return (
     <div>
-      {/* Display the current page's items */}
+      <h2>Combined Pain Points</h2>
       <ul>
-        {currentItems.map((item) => (
-          <li key={item.id}>{item.name}</li>
+        {painPointsArray.map((painPoint, index) => (
+          <li key={index}>{painPoint}</li>
         ))}
       </ul>
-
-      {/* Display the pagination component */}
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-      />
     </div>
   );
-};
+}
 
 export default MyComponent;

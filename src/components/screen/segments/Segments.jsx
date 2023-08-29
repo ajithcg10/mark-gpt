@@ -134,6 +134,7 @@ export default function Segments() {
   useEffect(() => {
     localStorage.removeItem("hasPageRefreshed");
   }, []);
+  console.log(jsonData, "json");
 
   return (
     <div>
@@ -157,7 +158,8 @@ export default function Segments() {
               </TopSection>
               <CenterContainer>
                 <Box>
-                  {Object.keys(jsonData)?.map((key) => {
+                  {Object.keys(jsonData)
+                  ?.map((key) => {
                     return (
                       <Item>
                         <Content>{key}</Content>
@@ -167,6 +169,7 @@ export default function Segments() {
                               <>
                                 {array.map((item) => {
                                   const obj = JSON.stringify(item);
+
                                   const newObj = obj.replace(/[{}"]/g, "");
 
                                   return segemnt_cart.some(

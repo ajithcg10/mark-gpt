@@ -121,14 +121,17 @@ export default function Points() {
   const pointsArray = data?.split("\n");
 
   // Remove empty elements and trim whitespace
-  const filteredPointsArray = pointsArray.filter(
+  const filteredPointsArray = pointsArray?.filter(
     (point) => point.trim() !== ""
   );
 
   // Remove <span> tags using regular expression
-  const strippedPointsArray = filteredPointsArray.map((point) =>
-    point.replace(/<span.*?>|<\/span>/g, "")
+  const strippedPointsArray = filteredPointsArray?.map((point) =>
+    point?.replace(/<span.*?>|<\/span>/g, "")
   );
+
+  console.log(strippedPointsArray, "strip");
+  // console.log(strippedPointsArray, "data");
 
   setTimeout(() => {
     if (isError) {
@@ -136,6 +139,7 @@ export default function Points() {
     }
   }, 1000);
   console.log(isError);
+
   return (
     <div>
       {data ? (
@@ -161,6 +165,7 @@ export default function Points() {
                   <Item>
                     <Sub>
                       {strippedPointsArray?.map((element) => {
+                        console.log(element, "ajith");
                         return points_cart.some((p) => p == element) ? (
                           <ValueConatiner
                             className="active"
